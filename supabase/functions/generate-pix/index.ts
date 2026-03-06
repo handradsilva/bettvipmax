@@ -43,8 +43,8 @@ Deno.serve(async (req) => {
     const userId = claimsData.claims.sub;
 
     const { amount, wantBonus } = await req.json();
-    if (!amount || amount <= 0) {
-      return new Response(JSON.stringify({ error: "Valor inválido" }), {
+    if (!amount || amount < 20) {
+      return new Response(JSON.stringify({ error: "Valor mínimo de R$ 20,00" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
