@@ -50,18 +50,46 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Fetch user profile for payer info
+    // Fetch profile for payer info; if missing, bootstrap it from auth claims
+    const userEmail =
+      typeof claimsData.claims.email === "string" && claimsData.claims.email.length > 0
+        ? claimsData.claims.email
+        : `${userId}@no-email.local`;
+
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("email, cpf")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
-      return new Response(JSON.stringify({ error: "Perfil não encontrado" }), {
-        status: 404,
+    if (profileError) {
+      console.error("Profile lookup error:", profileError);
+      return new Response(JSON.stringify({ error: "Erro ao buscar perfil" }), {
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    let payerEmail = profile?.email ?? userEmail;
+    let payerCpf = profile?.cpf ?? null;
+
+    if (!profile) {
+      const { data: createdProfile, error: createProfileError } = await supabase
+        .from("profiles")
+        .insert({ user_id: userId, email: userEmail })
+        .select("email, cpf")
+        .single();
+
+      if (createProfileError) {
+        console.error("Profile bootstrap error:", createProfileError);
+        return new Response(JSON.stringify({ error: "Perfil não encontrado" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      payerEmail = createdProfile.email;
+      payerCpf = createdProfile.cpf;
     }
 
     // BS Pay auth - get token
@@ -102,9 +130,9 @@ Deno.serve(async (req) => {
         payerQuestion: `Depósito PIX - R$ ${amount.toFixed(2)}`,
         postbackUrl: `${Deno.env.get("SUPABASE_URL")!}/functions/v1/bspay-webhook`,
         payer: {
-          name: profile.email.split("@")[0],
-          document: profile.cpf || "00000000000",
-          email: profile.email,
+          name: payerEmail.split("@")[0],
+          document: payerCpf || "00000000000",
+          email: payerEmail,
         },
       }),
     });
