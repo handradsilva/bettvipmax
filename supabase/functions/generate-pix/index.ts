@@ -130,9 +130,9 @@ Deno.serve(async (req) => {
         payerQuestion: `Depósito PIX - R$ ${amount.toFixed(2)}`,
         postbackUrl: `${Deno.env.get("SUPABASE_URL")!}/functions/v1/bspay-webhook`,
         payer: {
-          name: profile.email.split("@")[0],
-          document: profile.cpf || "00000000000",
-          email: profile.email,
+          name: payerEmail.split("@")[0],
+          document: payerCpf || "00000000000",
+          email: payerEmail,
         },
       }),
     });
