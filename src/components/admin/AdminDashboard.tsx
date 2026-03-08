@@ -13,6 +13,7 @@ interface Props {
 
 
 
+
 const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   const [startDate, setStartDate] = useState<Date>(new Date(2026, 0, 1));
   const [endDate, setEndDate] = useState<Date>(new Date());
