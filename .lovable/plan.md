@@ -1,33 +1,31 @@
 
 
-## Card de Funil de Conversão no Admin Dashboard
+## Corrigir erro "supabaseKey is required" na funcao check-payment-status
 
-### Contexto
-Atualmente todas as transações de depósito (normais e taxa de R$ 19,90) são armazenadas com `type = "deposit"`. A distinção pode ser feita pelo valor: transações com `amount === 19.90` são taxas de liberação.
+### Problema
+A funcao `check-payment-status` esta usando `SUPABASE_PUBLISHABLE_KEY` como nome de variavel de ambiente, mas o nome correto no ambiente das Edge Functions e `SUPABASE_ANON_KEY`. Isso faz com que o valor retorne `undefined`, causando o erro `supabaseKey is required` a cada chamada de polling.
 
-### O que será criado
-Um novo card no dashboard admin mostrando um funil de conversão com 3 etapas:
+### Impacto
+- O QR Code PIX e o copia e cola funcionam normalmente (generate-pix esta OK)
+- O polling de status do pagamento falha repetidamente (a cada 5 segundos)
+- O pagamento nunca sera confirmado automaticamente na tela, mesmo que o usuario pague
 
-1. **Cadastros** — total de usuários registrados (100%)
-2. **Depositaram** — usuários que têm pelo menos 1 depósito pago (`status === "completed"`) com valor diferente de 19.90
-3. **Pagaram taxa de liberação** — usuários que têm pelo menos 1 depósito pago com valor exatamente 19.90
+### Correcao
+Alterar uma unica linha no arquivo `supabase/functions/check-payment-status/index.ts`:
 
-Cada etapa mostra o número absoluto e a porcentagem em relação ao total de cadastros. Barras de progresso visuais ilustram a proporção.
+**Linha 25 - de:**
+```text
+Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
+```
 
-### Alterações
+**Para:**
+```text
+Deno.env.get("SUPABASE_ANON_KEY")
+```
 
-**Arquivo:** `src/components/admin/AdminDashboard.tsx`
-
-- Adicionar um `useMemo` que calcula:
-  - `totalUsers` = quantidade de profiles
-  - `usersWhoDeposited` = IDs únicos de transações `completed` com `amount !== 19.90`
-  - `usersWhoPaidFee` = IDs únicos de transações `completed` com `amount === 19.90`
-  - Percentuais de cada grupo sobre o total
-
-- Renderizar um novo card após os metrics existentes, com:
-  - Título "Funil de Conversão"
-  - 3 linhas com label, contagem, porcentagem e barra de progresso (`Progress` component)
-  - Cores diferenciadas para cada etapa
-
-Nenhuma alteração de banco de dados é necessária — os dados já existem nas transações.
+### Detalhes tecnicos
+- A variavel `SUPABASE_ANON_KEY` e fornecida automaticamente pelo Lovable Cloud em todas as Edge Functions
+- A variavel `SUPABASE_PUBLISHABLE_KEY` nao existe no ambiente das Edge Functions (e usada apenas no frontend como `VITE_SUPABASE_PUBLISHABLE_KEY`)
+- A funcao `generate-pix` ja usa `SUPABASE_ANON_KEY` corretamente, por isso funciona sem problemas
+- Apos a correcao, a funcao sera redeployada automaticamente
 

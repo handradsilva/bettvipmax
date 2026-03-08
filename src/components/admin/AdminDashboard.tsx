@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { Users, DollarSign, QrCode, UserPlus, TrendingUp, UserCheck } from "lucide-react";
+import { Users, DollarSign, QrCode, UserPlus, TrendingUp, Filter } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { format, parseISO, isToday, isAfter, isBefore, startOfDay, endOfDay, eachDayOfInterval, subDays } from "date-fns";
 import type { AdminProfile, AdminTransaction, AdminReferral } from "@/hooks/useAdminData";
 import AdminDateFilter from "./AdminDateFilter";
@@ -49,6 +50,20 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
     { label: "PIX Gerados (Geral)", value: `${deposits.length} (${paidDeposits.length} Pagos)`, icon: QrCode, color: "text-primary" },
   ];
 
+  const funnel = useMemo(() => {
+    const totalUsers = profiles.length;
+    const completedDeposits = transactions.filter((t) => t.type === "deposit" && t.status === "completed");
+    const usersDeposited = new Set(completedDeposits.filter((t) => t.amount !== 19.9).map((t) => t.user_id)).size;
+    const usersPaidFee = new Set(completedDeposits.filter((t) => t.amount === 19.9).map((t) => t.user_id)).size;
+    const pctDeposited = totalUsers > 0 ? (usersDeposited / totalUsers) * 100 : 0;
+    const pctPaidFee = totalUsers > 0 ? (usersPaidFee / totalUsers) * 100 : 0;
+    return [
+      { label: "Cadastros", count: totalUsers, pct: 100, color: "bg-primary" },
+      { label: "Depositaram", count: usersDeposited, pct: pctDeposited, color: "bg-chart-2" },
+      { label: "Pagaram taxa (R$ 19,90)", count: usersPaidFee, pct: pctPaidFee, color: "bg-chart-4" },
+    ];
+  }, [profiles, transactions]);
+
   const chartData = useMemo(() => {
     const days = eachDayOfInterval({
       start: subDays(endDate, 30) > startDate ? subDays(endDate, 30) : startDate,
@@ -85,6 +100,23 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
         ))}
       </div>
 
+
+      <div className="p-4 rounded-2xl bg-card border border-border">
+        <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Filter size={14} className="text-primary" /> Funil de Conversão
+        </h3>
+        <div className="space-y-4">
+          {funnel.map((step, i) => (
+            <div key={i} className="space-y-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{step.label}</span>
+                <span className="font-semibold text-foreground">{step.count} ({step.pct.toFixed(1)}%)</span>
+              </div>
+              <Progress value={step.pct} className="h-2.5" />
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="p-4 rounded-2xl bg-card border border-border">
