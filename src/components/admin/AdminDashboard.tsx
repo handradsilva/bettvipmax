@@ -10,7 +10,7 @@ interface Props {
   referrals: AdminReferral[];
 }
 
-const AFFILIATE_EMAILS = ["filipeafiliado@gmail.com", "italoafiliado2@gmail.com"];
+
 
 const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   const [startDate, setStartDate] = useState<Date>(new Date(2026, 0, 1));
