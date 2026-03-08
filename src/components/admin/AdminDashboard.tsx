@@ -101,6 +101,23 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
       </div>
 
 
+      <div className="p-4 rounded-2xl bg-card border border-border">
+        <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Filter size={14} className="text-primary" /> Funil de Conversão
+        </h3>
+        <div className="space-y-4">
+          {funnel.map((step, i) => (
+            <div key={i} className="space-y-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{step.label}</span>
+                <span className="font-semibold text-foreground">{step.count} ({step.pct.toFixed(1)}%)</span>
+              </div>
+              <Progress value={step.pct} className="h-2.5" />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="p-4 rounded-2xl bg-card border border-border">
           <h3 className="text-sm font-semibold text-foreground mb-4">PIX Recebidos (R$)</h3>
