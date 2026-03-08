@@ -63,7 +63,7 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
       { label: "Depositaram", count: usersDeposited, pct: pctDeposited, color: "bg-chart-2" },
       { label: "Pagaram taxa (R$ 19,90)", count: usersPaidFee, pct: pctPaidFee, color: "bg-chart-4" },
     ];
-  }, [profiles, transactions]);
+  }, [filtered]);
 
   const chartData = useMemo(() => {
     const days = eachDayOfInterval({
