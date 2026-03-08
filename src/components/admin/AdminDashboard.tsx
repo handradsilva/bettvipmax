@@ -85,33 +85,6 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {affiliateCards.map((aff) => (
-          <div key={aff.email} className="p-4 rounded-2xl bg-card border border-border">
-            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
-              <UserCheck size={14} className="text-primary" /> {aff.email}
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <p className="text-xs text-muted-foreground">Leads (Hoje)</p>
-                <p className="font-bold text-foreground">{aff.leadsToday}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Leads (Período)</p>
-                <p className="font-bold text-foreground">{aff.leads}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">FTDs</p>
-                <p className="font-bold text-foreground">{aff.ftds}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Volume Depósitos</p>
-                <p className="font-bold text-foreground">R$ {aff.volume.toFixed(2).replace(".", ",")}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="p-4 rounded-2xl bg-card border border-border">
