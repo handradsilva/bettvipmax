@@ -39,27 +39,6 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   const totalPixValue = paidDeposits.reduce((s, t) => s + t.amount, 0);
   const todayPixValue = todayPaid.reduce((s, t) => s + t.amount, 0);
 
-  const affiliateCards = useMemo(() => {
-    const s = startOfDay(startDate);
-    const e = endOfDay(endDate);
-    return AFFILIATE_EMAILS.map((email) => {
-      const profile = profiles.find((p) => p.email === email);
-      if (!profile) return { email, leads: 0, leadsToday: 0, ftds: 0, volume: 0 };
-      const affReferrals = referrals.filter((r) => r.referrer_user_id === profile.user_id);
-      const affReferralsFiltered = affReferrals.filter((r) => {
-        const d = parseISO(r.created_at);
-        return isAfter(d, s) && isBefore(d, e);
-      });
-      const referredIds = new Set(affReferralsFiltered.map((r) => r.referred_user_id));
-      const referredDeposits = filtered.tx.filter(
-        (t) => referredIds.has(t.user_id) && t.type === "deposit" && t.status === "completed"
-      );
-      const ftdUsers = new Set(referredDeposits.map((t) => t.user_id));
-      const volume = referredDeposits.reduce((sum, t) => sum + t.amount, 0);
-      const leadsToday = affReferrals.filter((r) => isToday(parseISO(r.created_at))).length;
-      return { email, leads: affReferralsFiltered.length, leadsToday, ftds: ftdUsers.size, volume };
-    });
-  }, [profiles, referrals, filtered.tx, startDate, endDate]);
 
   const metrics = [
     { label: "Total de Usuários", value: profiles.length, icon: Users, color: "text-primary" },
