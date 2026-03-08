@@ -1,29 +1,31 @@
 
 
-## Plan: SEO Optimization for "Betvipmaxx" Ranking
+## Corrigir erro "supabaseKey is required" na funcao check-payment-status
 
-Your site currently has generic "Lovable App" titles and descriptions — Google is indexing placeholder content. Here's what needs to change:
+### Problema
+A funcao `check-payment-status` esta usando `SUPABASE_PUBLISHABLE_KEY` como nome de variavel de ambiente, mas o nome correto no ambiente das Edge Functions e `SUPABASE_ANON_KEY`. Isso faz com que o valor retorne `undefined`, causando o erro `supabaseKey is required` a cada chamada de polling.
 
-### 1. Update `index.html` meta tags
-- **Title:** `BETVIPMAXX | Jogar é fácil, ganhar é ainda melhor | Apostas Online`
-- **Description:** `Betvipmaxx - A melhor plataforma de apostas online. Jogos de cassino, apostas esportivas e bônus exclusivos. Jogue agora em betvipmaxx.com.br`
-- **Lang:** `pt-BR` instead of `en`
-- **og:url:** `https://www.betvipmaxx.com.br`
-- Update all `og:title`, `og:description`, `twitter:title`, `twitter:description` to match
-- Remove "Lovable" references from author/twitter:site
+### Impacto
+- O QR Code PIX e o copia e cola funcionam normalmente (generate-pix esta OK)
+- O polling de status do pagamento falha repetidamente (a cada 5 segundos)
+- O pagamento nunca sera confirmado automaticamente na tela, mesmo que o usuario pague
 
-### 2. Add `public/sitemap.xml`
-- List main pages: `/`, `/auth`, `/deposit`, `/sports`, `/affiliate`
-- Set `https://www.betvipmaxx.com.br` as base URL
+### Correcao
+Alterar uma unica linha no arquivo `supabase/functions/check-payment-status/index.ts`:
 
-### 3. Update `public/robots.txt`
-- Add `Sitemap: https://www.betvipmaxx.com.br/sitemap.xml`
+**Linha 25 - de:**
+```text
+Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
+```
 
-### 4. Add canonical link in `index.html`
-- `<link rel="canonical" href="https://www.betvipmaxx.com.br" />`
+**Para:**
+```text
+Deno.env.get("SUPABASE_ANON_KEY")
+```
 
-### Important SEO notes (beyond code)
-- **Google Search Console:** Register your domain `betvipmaxx.com.br` and submit the sitemap — this is the #1 action to get indexed faster
-- **Backlinks & content** matter more than meta tags for ranking position
-- Google re-crawl takes days/weeks after changes
+### Detalhes tecnicos
+- A variavel `SUPABASE_ANON_KEY` e fornecida automaticamente pelo Lovable Cloud em todas as Edge Functions
+- A variavel `SUPABASE_PUBLISHABLE_KEY` nao existe no ambiente das Edge Functions (e usada apenas no frontend como `VITE_SUPABASE_PUBLISHABLE_KEY`)
+- A funcao `generate-pix` ja usa `SUPABASE_ANON_KEY` corretamente, por isso funciona sem problemas
+- Apos a correcao, a funcao sera redeployada automaticamente
 
