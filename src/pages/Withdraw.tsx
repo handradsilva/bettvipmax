@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import pixIcon from "@/assets/pix-icon.png";
 import {
   Dialog,
   DialogContent,
