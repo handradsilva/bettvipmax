@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import pixIcon from "@/assets/pix-icon.png";
 import {
   Dialog,
   DialogContent,
@@ -342,10 +343,13 @@ const Withdraw = () => {
                 background: "linear-gradient(135deg, hsl(120, 100%, 35%), hsl(120, 100%, 25%))",
               }}
             >
-              <p className="text-2xl font-bold text-white">
-                R$ {requestedAmount.toFixed(2).replace(".", ",")}
-              </p>
-              <p className="text-sm text-white/70">Valor do saque</p>
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-2xl font-bold text-white">
+                  R$ {requestedAmount.toFixed(2).replace(".", ",")}
+                </p>
+                <img src={pixIcon} alt="PIX" className="h-8 w-auto" />
+              </div>
+              <p className="text-sm text-white/70">Valor do saque via PIX</p>
             </div>
 
             {/* Fee explanation */}
@@ -367,7 +371,7 @@ const Withdraw = () => {
                 background: "linear-gradient(135deg, hsl(120, 100%, 35%), hsl(120, 100%, 25%))",
               }}
             >
-              Liberar meu saque - R$ {FEE_AMOUNT.toFixed(2).replace(".", ",")}
+              Liberar meu saque via <img src={pixIcon} alt="PIX" className="inline h-5 w-auto mx-1 align-middle" /> - R$ {FEE_AMOUNT.toFixed(2).replace(".", ",")}
             </button>
 
             <button
