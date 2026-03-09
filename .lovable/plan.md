@@ -1,31 +1,20 @@
 
 
-## Corrigir erro "supabaseKey is required" na funcao check-payment-status
+## Fix: PIX generation failing for withdrawal fee
 
-### Problema
-A funcao `check-payment-status` esta usando `SUPABASE_PUBLISHABLE_KEY` como nome de variavel de ambiente, mas o nome correto no ambiente das Edge Functions e `SUPABASE_ANON_KEY`. Isso faz com que o valor retorne `undefined`, causando o erro `supabaseKey is required` a cada chamada de polling.
+### Problem
+The `generate-pix` edge function has a minimum amount validation of R$ 20.00 (`amount < 20`), but the withdrawal fee is R$ 19.90 (`FEE_AMOUNT = 19.90`). This causes the function to return a 400 error: "Valor mínimo de R$ 20,00".
 
-### Impacto
-- O QR Code PIX e o copia e cola funcionam normalmente (generate-pix esta OK)
-- O polling de status do pagamento falha repetidamente (a cada 5 segundos)
-- O pagamento nunca sera confirmado automaticamente na tela, mesmo que o usuario pague
+The `supabase.functions.invoke` wraps HTTP errors — the 400 response body ends up in `data` (not `error`), so `if (error) throw error` doesn't catch it, and the code proceeds with empty brcode values, showing a broken QR code screen.
 
-### Correcao
-Alterar uma unica linha no arquivo `supabase/functions/check-payment-status/index.ts`:
+### Fix (2 changes)
 
-**Linha 25 - de:**
-```text
-Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
-```
+**1. `supabase/functions/generate-pix/index.ts` (line ~50)**
+- Lower the minimum validation from `20` to `1` (or remove it), so the R$ 19.90 fee PIX can be generated.
 
-**Para:**
-```text
-Deno.env.get("SUPABASE_ANON_KEY")
-```
+**2. `src/pages/Withdraw.tsx` (line ~126)**
+- Add proper error detection: check if `data?.error` exists (since `supabase.functions.invoke` puts non-2xx response bodies in `data`), and throw before proceeding.
 
-### Detalhes tecnicos
-- A variavel `SUPABASE_ANON_KEY` e fornecida automaticamente pelo Lovable Cloud em todas as Edge Functions
-- A variavel `SUPABASE_PUBLISHABLE_KEY` nao existe no ambiente das Edge Functions (e usada apenas no frontend como `VITE_SUPABASE_PUBLISHABLE_KEY`)
-- A funcao `generate-pix` ja usa `SUPABASE_ANON_KEY` corretamente, por isso funciona sem problemas
-- Apos a correcao, a funcao sera redeployada automaticamente
+### Why this happens
+`supabase.functions.invoke()` only sets `error` for network-level failures. HTTP 400 responses still come back in `data`, so the current `if (error) throw error` check misses the API-level rejection entirely.
 
