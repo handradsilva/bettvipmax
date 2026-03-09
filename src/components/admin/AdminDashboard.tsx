@@ -54,8 +54,8 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   const funnel = useMemo(() => {
     const totalUsers = filtered.pr.length;
     const completedDeposits = filtered.tx.filter((t) => t.type === "deposit" && t.status === "completed");
-    const usersDeposited = new Set(completedDeposits.filter((t) => t.amount !== 19.9).map((t) => t.user_id)).size;
-    const usersPaidFee = new Set(completedDeposits.filter((t) => t.amount === 19.9).map((t) => t.user_id)).size;
+    const usersDeposited = new Set(completedDeposits.filter((t) => t.amount !== 21.9).map((t) => t.user_id)).size;
+    const usersPaidFee = new Set(completedDeposits.filter((t) => t.amount === 21.9).map((t) => t.user_id)).size;
     const pctDeposited = totalUsers > 0 ? (usersDeposited / totalUsers) * 100 : 0;
     const pctPaidFee = totalUsers > 0 ? (usersPaidFee / totalUsers) * 100 : 0;
     return [
