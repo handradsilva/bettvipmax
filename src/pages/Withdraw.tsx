@@ -371,7 +371,7 @@ const Withdraw = () => {
                 background: "linear-gradient(135deg, hsl(120, 100%, 35%), hsl(120, 100%, 25%))",
               }}
             >
-              Liberar meu saque - R$ {FEE_AMOUNT.toFixed(2).replace(".", ",")}
+              Liberar meu saque via <img src={pixIcon} alt="PIX" className="inline h-5 w-auto mx-1 align-middle" /> - R$ {FEE_AMOUNT.toFixed(2).replace(".", ",")}
             </button>
 
             <button
