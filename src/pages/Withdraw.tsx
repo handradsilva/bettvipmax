@@ -124,6 +124,7 @@ const Withdraw = () => {
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       const txId = data?.transaction_id || "";
       const pixBrcode = data?.brcode || "";
