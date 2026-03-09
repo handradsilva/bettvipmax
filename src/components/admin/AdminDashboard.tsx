@@ -61,7 +61,7 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
     return [
       { label: "Cadastros", count: totalUsers, pct: totalUsers > 0 ? 100 : 0, color: "bg-primary" },
       { label: "Depositaram", count: usersDeposited, pct: pctDeposited, color: "bg-chart-2" },
-      { label: "Pagaram taxa (R$ 19,90)", count: usersPaidFee, pct: pctPaidFee, color: "bg-chart-4" },
+      { label: "Pagaram taxa (R$ 21,90)", count: usersPaidFee, pct: pctPaidFee, color: "bg-chart-4" },
     ];
   }, [filtered]);
 
