@@ -343,10 +343,13 @@ const Withdraw = () => {
                 background: "linear-gradient(135deg, hsl(120, 100%, 35%), hsl(120, 100%, 25%))",
               }}
             >
-              <p className="text-2xl font-bold text-white">
-                R$ {requestedAmount.toFixed(2).replace(".", ",")}
-              </p>
-              <p className="text-sm text-white/70">Valor do saque</p>
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-2xl font-bold text-white">
+                  R$ {requestedAmount.toFixed(2).replace(".", ",")}
+                </p>
+                <img src={pixIcon} alt="PIX" className="h-8 w-auto" />
+              </div>
+              <p className="text-sm text-white/70">Valor do saque via PIX</p>
             </div>
 
             {/* Fee explanation */}
