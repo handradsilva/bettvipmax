@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
         postbackUrl: `${Deno.env.get("SUPABASE_URL")!}/functions/v1/bspay-webhook`,
         payer: {
           name: payerEmail.split("@")[0],
-          document: payerCpf || "00000000000",
+          ...(payerCpf ? { document: payerCpf } : {}),
           email: payerEmail,
         },
       }),
