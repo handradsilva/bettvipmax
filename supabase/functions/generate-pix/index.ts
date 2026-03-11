@@ -118,23 +118,26 @@ Deno.serve(async (req) => {
     const accessToken = tokenData.access_token;
 
     // Generate PIX QR Code
+    const pixBody = {
+      amount: Number(amount),
+      external_id: crypto.randomUUID(),
+      payerQuestion: `Depósito PIX - R$ ${Number(amount).toFixed(2)}`,
+      postbackUrl: `${Deno.env.get("SUPABASE_URL")!}/functions/v1/bspay-webhook`,
+      payer: {
+        name: payerEmail.split("@")[0],
+        document: payerCpf || "00000000191",
+        email: payerEmail,
+      },
+    };
+    console.log("BS Pay PIX request body:", JSON.stringify(pixBody));
+
     const pixRes = await fetch("https://api.bspay.co/v2/pix/qrcode", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        amount: Number(amount),
-        external_id: crypto.randomUUID(),
-        payerQuestion: `Depósito PIX - R$ ${amount.toFixed(2)}`,
-        postbackUrl: `${Deno.env.get("SUPABASE_URL")!}/functions/v1/bspay-webhook`,
-        payer: {
-          name: payerEmail.split("@")[0],
-          document: payerCpf || "00000000191",
-          email: payerEmail,
-        },
-      }),
+      body: JSON.stringify(pixBody),
     });
 
     if (!pixRes.ok) {
