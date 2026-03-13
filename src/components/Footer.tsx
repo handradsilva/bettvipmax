@@ -1,4 +1,5 @@
 import { ArrowUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -6,21 +7,37 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-card border-t border-border mt-10">
+    <footer className="bg-card border-t border-border mt-10" itemScope itemType="https://schema.org/WPFooter">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-10">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/images/logo.avif" alt="VIPBetMax" className="h-8 sm:h-10" />
+          <Link to="/" title="BetVipMax - betvipmax - Página Inicial">
+            <img src="/images/logo.avif" alt="BetVipMax - betvipmax logo" className="h-8 sm:h-10" />
+          </Link>
         </div>
 
-        {/* Links */}
-        <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 sm:gap-4 mb-6 text-xs sm:text-sm text-muted-foreground">
-          {["Termos de uso", "Termos de apostas", "Política AML", "Política de privacidade", "Jogo responsável", "Seja um afiliado"].map((link) => (
-            <a key={link} href="#" className="hover:text-primary transition-colors">
-              {link}
-            </a>
-          ))}
-        </div>
+        {/* SEO keyword-rich description */}
+        <p className="text-center text-xs text-muted-foreground mb-6 max-w-2xl mx-auto">
+          <strong>BetVipMax</strong> (betvipmax / vipbetmax / bet vip max) — Sua plataforma de apostas online, cassino ao vivo e esportes. Acesse <strong>bettvipmax.com</strong>.
+        </p>
+
+        {/* Internal links for SEO */}
+        <nav aria-label="Links do rodapé">
+          <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 sm:gap-4 mb-6 text-xs sm:text-sm text-muted-foreground">
+            <Link to="/" className="hover:text-primary transition-colors">Cassino Online</Link>
+            <Link to="/sports" className="hover:text-primary transition-colors">Apostas Esportivas</Link>
+            <Link to="/auth?mode=register" className="hover:text-primary transition-colors">Cadastre-se</Link>
+            <Link to="/deposit" className="hover:text-primary transition-colors">Depositar via PIX</Link>
+            <Link to="/affiliate" className="hover:text-primary transition-colors">Seja um Afiliado</Link>
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 sm:gap-4 mb-6 text-xs sm:text-sm text-muted-foreground">
+            {["Termos de uso", "Termos de apostas", "Política AML", "Política de privacidade", "Jogo responsável"].map((link) => (
+              <a key={link} href="#" className="hover:text-primary transition-colors">
+                {link}
+              </a>
+            ))}
+          </div>
+        </nav>
 
         {/* Payment method */}
         <div className="flex justify-center mb-6">
@@ -32,9 +49,9 @@ const Footer = () => {
         {/* Social icons */}
         <div className="flex justify-center gap-3 sm:gap-4 mb-6">
           {[
-            { name: "Instagram", icon: "📸", url: "#" },
-            { name: "YouTube", icon: "▶️", url: "#" },
-            { name: "Telegram", icon: "✈️", url: "#" },
+            { name: "Instagram BetVipMax", icon: "📸", url: "#" },
+            { name: "YouTube BetVipMax", icon: "▶️", url: "#" },
+            { name: "Telegram BetVipMax", icon: "✈️", url: "#" },
           ].map(({ name, icon, url }) => (
             <a
               key={name}
@@ -43,6 +60,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-secondary flex items-center justify-center text-base sm:text-lg hover:bg-primary hover:text-primary-foreground transition-all"
               title={name}
+              aria-label={name}
             >
               {icon}
             </a>
@@ -68,7 +86,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <p className="text-center text-[10px] sm:text-xs text-muted-foreground">
-          © 2024 VIPBetMax. Todos os direitos reservados. | Jogue com responsabilidade.
+          © 2024 BetVipMax (betvipmax). Todos os direitos reservados. | Jogue com responsabilidade. | bettvipmax.com
         </p>
 
         {/* Back to top */}

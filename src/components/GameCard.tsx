@@ -9,30 +9,29 @@ const GameCard = ({ game }: GameCardProps) => {
   const navigate = useNavigate();
 
   return (
-    <div
+    <article
       className="group relative rounded-lg sm:rounded-xl overflow-hidden game-card-hover cursor-pointer bg-card"
       onClick={() => navigate(`/game/${game.id}`)}
+      title={`Jogar ${game.name} no BetVipMax - betvipmax`}
     >
       <div className="aspect-square overflow-hidden">
         <img
           src={game.image}
-          alt={game.name}
+          alt={`${game.name} - Jogar no BetVipMax (betvipmax)`}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           loading="lazy"
         />
       </div>
-      {/* Overlay on hover */}
       <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <p className="text-foreground font-bold text-xs sm:text-sm mb-2 text-center px-1 sm:px-2">{game.name}</p>
         <button className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold neon-glow hover:brightness-110 transition-all">
           JOGAR AGORA!
         </button>
       </div>
-      {/* Name below */}
       <div className="p-1.5 sm:p-2">
         <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{game.name}</p>
       </div>
-    </div>
+    </article>
   );
 };
 
