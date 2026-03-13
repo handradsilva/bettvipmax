@@ -12,7 +12,7 @@ const GameSection = ({ title, games, icon }: GameSectionProps) => {
   if (games.length === 0) return null;
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-3" aria-label={`${title} - BetVipMax`}>
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-base sm:text-lg font-bold text-foreground">
           {icon}
