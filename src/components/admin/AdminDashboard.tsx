@@ -52,18 +52,18 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   ];
 
   const funnel = useMemo(() => {
-    const totalUsers = filtered.pr.length;
+    const totalUsers = profiles.length;
     const completedDeposits = filtered.tx.filter((t) => t.type === "deposit" && t.status === "completed");
     const usersDeposited = new Set(completedDeposits.filter((t) => t.amount !== 21.9).map((t) => t.user_id)).size;
     const usersPaidFee = new Set(completedDeposits.filter((t) => t.amount === 21.9).map((t) => t.user_id)).size;
-    const pctDeposited = totalUsers > 0 ? (usersDeposited / totalUsers) * 100 : 0;
-    const pctPaidFee = totalUsers > 0 ? (usersPaidFee / totalUsers) * 100 : 0;
+    const pctDeposited = totalUsers > 0 ? Math.min((usersDeposited / totalUsers) * 100, 100) : 0;
+    const pctPaidFee = totalUsers > 0 ? Math.min((usersPaidFee / totalUsers) * 100, 100) : 0;
     return [
-      { label: "Cadastros", count: totalUsers, pct: totalUsers > 0 ? 100 : 0, color: "bg-primary" },
+      { label: "Cadastros", count: totalUsers, pct: 100, color: "bg-primary" },
       { label: "Depositaram", count: usersDeposited, pct: pctDeposited, color: "bg-chart-2" },
       { label: "Pagaram taxa (R$ 21,90)", count: usersPaidFee, pct: pctPaidFee, color: "bg-chart-4" },
     ];
-  }, [filtered]);
+  }, [profiles, filtered]);
 
   const chartData = useMemo(() => {
     const days = eachDayOfInterval({
