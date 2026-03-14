@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Users, DollarSign, QrCode, UserPlus, TrendingUp, Filter } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { format, parseISO, isToday, isAfter, isBefore, startOfDay, endOfDay, eachDayOfInterval, subDays } from "date-fns";
+import { format, parseISO, isToday, isWithinInterval, startOfDay, endOfDay, eachDayOfInterval, subDays } from "date-fns";
 import type { AdminProfile, AdminTransaction, AdminReferral } from "@/hooks/useAdminData";
 import AdminDateFilter from "./AdminDateFilter";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
