@@ -21,14 +21,16 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   const filtered = useMemo(() => {
     const s = startOfDay(startDate);
     const e = endOfDay(endDate);
-    const tx = transactions.filter((t) => {
-      const d = parseISO(t.created_at);
-      return isAfter(d, s) && isBefore(d, e);
-    });
-    const pr = profiles.filter((p) => {
-      const d = parseISO(p.created_at);
-      return isAfter(d, s) && isBefore(d, e);
-    });
+
+    const inRange = (isoDate: string) =>
+      isWithinInterval(parseISO(isoDate), {
+        start: s,
+        end: e,
+      });
+
+    const tx = transactions.filter((t) => inRange(t.created_at));
+    const pr = profiles.filter((p) => inRange(p.created_at));
+
     return { tx, pr };
   }, [transactions, profiles, startDate, endDate]);
 
@@ -41,7 +43,6 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
   const totalPixValue = paidDeposits.reduce((s, t) => s + t.amount, 0);
   const todayPixValue = todayPaid.reduce((s, t) => s + t.amount, 0);
 
-
   const metrics = [
     { label: "Total de Usuários", value: profiles.length, icon: Users, color: "text-primary" },
     { label: "Saldo PIX (Hoje)", value: `R$ ${todayPixValue.toFixed(2).replace(".", ",")}`, icon: DollarSign, color: "text-primary" },
@@ -53,15 +54,30 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
 
   const funnel = useMemo(() => {
     const totalUsers = filtered.pr.length;
-    const completedDeposits = filtered.tx.filter((t) => t.type === "deposit" && t.status === "completed");
-    const usersDeposited = new Set(completedDeposits.filter((t) => t.amount !== 21.9).map((t) => t.user_id)).size;
-    const usersPaidFee = new Set(completedDeposits.filter((t) => t.amount === 21.9).map((t) => t.user_id)).size;
-    const pctDeposited = totalUsers > 0 ? Math.min((usersDeposited / totalUsers) * 100, 100) : 0;
-    const pctPaidFee = totalUsers > 0 ? Math.min((usersPaidFee / totalUsers) * 100, 100) : 0;
+    const registeredUsersInRange = new Set(filtered.pr.map((p) => p.user_id));
+
+    const cohortCompletedDeposits = filtered.tx.filter(
+      (t) =>
+        t.type === "deposit" &&
+        t.status === "completed" &&
+        registeredUsersInRange.has(t.user_id)
+    );
+
+    const usersDeposited = new Set(
+      cohortCompletedDeposits.filter((t) => t.amount !== 21.9).map((t) => t.user_id)
+    ).size;
+
+    const usersPaidFee = new Set(
+      cohortCompletedDeposits.filter((t) => t.amount === 21.9).map((t) => t.user_id)
+    ).size;
+
+    const pctDeposited = totalUsers > 0 ? (usersDeposited / totalUsers) * 100 : 0;
+    const pctPaidFee = totalUsers > 0 ? (usersPaidFee / totalUsers) * 100 : 0;
+
     return [
       { label: "Cadastros", count: totalUsers, pct: totalUsers > 0 ? 100 : 0, color: "bg-primary" },
-      { label: "Depositaram", count: usersDeposited, pct: pctDeposited, color: "bg-chart-2" },
-      { label: "Pagaram taxa (R$ 21,90)", count: usersPaidFee, pct: pctPaidFee, color: "bg-chart-4" },
+      { label: "Depositaram", count: usersDeposited, pct: Math.min(pctDeposited, 100), color: "bg-chart-2" },
+      { label: "Pagaram taxa (R$ 21,90)", count: usersPaidFee, pct: Math.min(pctPaidFee, 100), color: "bg-chart-4" },
     ];
   }, [filtered]);
 
