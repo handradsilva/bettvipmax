@@ -92,11 +92,11 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
       const dayEnd = endOfDay(day);
       const dayPaid = paidDeposits.filter((t) => {
         const d = parseISO(t.created_at);
-        return isAfter(d, dayStart) && isBefore(d, dayEnd);
+        return isWithinInterval(d, { start: dayStart, end: dayEnd });
       });
       const dayRegs = profiles.filter((p) => {
         const d = parseISO(p.created_at);
-        return isAfter(d, dayStart) && isBefore(d, dayEnd);
+        return isWithinInterval(d, { start: dayStart, end: dayEnd });
       });
       return { name: dayStr, pix: dayPaid.reduce((s, t) => s + t.amount, 0), users: dayRegs.length };
     });
