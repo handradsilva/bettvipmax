@@ -61,7 +61,7 @@ const Affiliate = () => {
   };
 
   const referralCode = (profile as any)?.referral_code || "...";
-  const referralLink = `https://www.betvipmaxx.com.br/?ref=${referralCode}`;
+  const referralLink = `https://www.bettvipmax.com/?ref=${referralCode}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralLink);
