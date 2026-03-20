@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, Phone, Mail, CreditCard, Calendar } from "lucide-react";
 
