@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 import { toast } from "@/hooks/use-toast";
 
 const Auth = () => {
@@ -48,12 +49,21 @@ const Auth = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title={isRegister ? "Cadastro | BetVipMax - betvipmax" : "Login | BetVipMax - betvipmax"}
+        description={isRegister
+          ? "Crie sua conta no BetVipMax (betvipmax). Cadastre-se grátis e ganhe bônus no primeiro depósito. Jogue slots, crash games e cassino ao vivo em bettvipmax.com!"
+          : "Faça login no BetVipMax (betvipmax). Acesse sua conta para jogar cassino online, slots e apostas esportivas em bettvipmax.com!"
+        }
+        keywords="betvipmax cadastro, betvipmax login, criar conta betvipmax, vipbetmax registro, bet vip max entrar, bettvipmax cadastro"
+        path="/auth"
+      />
       <div className="flex items-center justify-center min-h-[70vh]">
         <div className="w-full max-w-md p-6 rounded-2xl bg-card border border-border">
           <div className="text-center mb-6">
-            <img src="/images/logo.avif" alt="VIPBetMax" className="h-10 mx-auto mb-4" />
+            <img src="/images/logo.avif" alt="BetVipMax - betvipmax cassino online" className="h-10 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-foreground">
-              {isRegister ? "Criar conta" : "Entrar na conta"}
+              {isRegister ? "Criar conta no BetVipMax" : "Entrar no BetVipMax"}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {isRegister ? "Preencha os dados para criar sua conta" : "Entre com suas credenciais para continuar"}

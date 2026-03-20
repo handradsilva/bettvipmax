@@ -1,17 +1,24 @@
 import { ArrowLeft, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 
 const Sports = () => {
   return (
     <Layout>
+      <SEOHead
+        title="Apostas Esportivas | BetVipMax - betvipmax"
+        description="Apostas esportivas no BetVipMax (betvipmax). Aposte em futebol, basquete, tênis e mais com as melhores odds. Deposite via PIX em bettvipmax.com!"
+        keywords="betvipmax apostas esportivas, vipbetmax esportes, bet vip max futebol, apostas online futebol, odds esportivas, bettvipmax esportes"
+        path="/sports"
+      />
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4 space-y-6">
         <Trophy size={64} className="text-primary" />
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-          Apostas Esportivas
+          Apostas Esportivas - BetVipMax
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base max-w-md">
-          As apostas em jogos esportivos estarão disponíveis em breve! Estamos preparando as melhores odds para você.
+          As apostas em jogos esportivos estarão disponíveis em breve! Estamos preparando as melhores odds para você no betvipmax.
         </p>
         <Link
           to="/"

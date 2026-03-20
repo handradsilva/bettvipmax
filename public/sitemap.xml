@@ -2,38 +2,83 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.bettvipmax.com/</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.bettvipmax.com/auth</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.bettvipmax.com/deposit</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.bettvipmax.com/sports</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.bettvipmax.com/affiliate</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.bettvipmax.com/wallet</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://www.bettvipmax.com/withdraw</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.bettvipmax.com/my-account</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <!-- Game pages -->
+  <url><loc>https://www.bettvipmax.com/game/1</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/2</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/3</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/4</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/5</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/6</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/7</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/8</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/9</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/10</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/11</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/12</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/13</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/14</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/15</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/16</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/17</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/18</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/19</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/20</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/21</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/22</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/23</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/24</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/25</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/26</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/27</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/28</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/29</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/30</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/31</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bettvipmax.com/game/32</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

@@ -42,6 +42,12 @@ const Wallet = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Carteira | BetVipMax - betvipmax"
+        description="Gerencie seu saldo e transações no BetVipMax (betvipmax). Veja depósitos, saques e histórico completo em bettvipmax.com!"
+        keywords="betvipmax carteira, saldo betvipmax, vipbetmax transações, bettvipmax historico"
+        path="/wallet"
+      />
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground mb-6">Minha Carteira</h1>
 

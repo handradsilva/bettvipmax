@@ -73,6 +73,12 @@ const Affiliate = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Programa de Afiliados | BetVipMax - betvipmax"
+        description="Ganhe dinheiro indicando amigos no BetVipMax (betvipmax). Programa de afiliados com comissões por cada indicado. Comece agora em bettvipmax.com!"
+        keywords="betvipmax afiliados, programa afiliados betvipmax, vipbetmax afiliado, ganhar dinheiro betvipmax, bettvipmax indicar amigos"
+        path="/affiliate"
+      />
       <div className="flex items-center justify-center min-h-[70vh]">
         <div className="w-full max-w-lg p-6 space-y-6">
           {/* Header */}
