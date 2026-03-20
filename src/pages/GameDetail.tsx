@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 import { games } from "@/data/games";
 import { ArrowLeft, Wallet, Maximize2, Star, Users } from "lucide-react";
 
@@ -19,6 +20,12 @@ const GameDetail = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title={`${game.name} | Jogar no BetVipMax - betvipmax`}
+        description={`Jogue ${game.name} de ${game.provider} no BetVipMax (betvipmax). Slots, crash games e cassino ao vivo com bônus exclusivos em bettvipmax.com!`}
+        keywords={`${game.name.toLowerCase()} betvipmax, jogar ${game.name.toLowerCase()}, ${game.provider.toLowerCase()} betvipmax, ${game.name.toLowerCase()} online`}
+        path={`/game/${game.id}`}
+      />
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-5">
         {/* Back */}
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">

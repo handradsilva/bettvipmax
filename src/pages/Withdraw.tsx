@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -255,6 +256,12 @@ const Withdraw = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Sacar via PIX | BetVipMax - betvipmax"
+        description="Saque seus ganhos via PIX no BetVipMax (betvipmax). Saque mínimo R$ 20 com pagamento instantâneo. Retire agora em bettvipmax.com!"
+        keywords="betvipmax sacar, saque pix betvipmax, vipbetmax saque, retirar dinheiro betvipmax, bettvipmax saque pix"
+        path="/withdraw"
+      />
       <div className="flex items-center justify-center min-h-[70vh]">
         <div className="w-full max-w-md p-6 rounded-2xl bg-card border border-border">
           <h1 className="text-2xl font-bold text-foreground mb-2 text-center">Sacar</h1>

@@ -3,12 +3,16 @@ import { useEffect } from "react";
 interface SEOHeadProps {
   title?: string;
   description?: string;
+  keywords?: string;
   path?: string;
 }
+
+const DEFAULT_KEYWORDS = "betvipmax, vipbetmax, bet vip max, bettvipmax, betvip max, apostas online, cassino online, apostas esportivas, slots, jogos de cassino, bônus apostas, cassino ao vivo, plinko, mines, aviator, crash games, fortune tiger, fortune dragon, gates of olympus, sweet bonanza";
 
 const SEOHead = ({
   title = "BetVipMax | Apostas Online, Cassino e Esportes | betvipmax",
   description = "BetVipMax (betvipmax) - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora em bettvipmax.com!",
+  keywords = DEFAULT_KEYWORDS,
   path = "/",
 }: SEOHeadProps) => {
   const baseUrl = "https://www.bettvipmax.com";
@@ -29,12 +33,12 @@ const SEOHead = ({
     };
 
     setMeta("description", description);
-    setMeta("keywords", "betvipmax, vipbetmax, bet vip max, bettvipmax, apostas online, cassino online, apostas esportivas, slots, jogos de cassino, bônus apostas, cassino ao vivo, plinko, mines, aviator, crash games");
+    setMeta("keywords", keywords);
     setMeta("og:title", title, true);
     setMeta("og:description", description, true);
     setMeta("og:url", fullUrl, true);
-    setMeta("twitter:title", title, true);
-    setMeta("twitter:description", description, true);
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
 
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     if (!canonical) {
@@ -43,7 +47,7 @@ const SEOHead = ({
       document.head.appendChild(canonical);
     }
     canonical.href = fullUrl;
-  }, [title, description, fullUrl]);
+  }, [title, description, keywords, fullUrl]);
 
   return null;
 };

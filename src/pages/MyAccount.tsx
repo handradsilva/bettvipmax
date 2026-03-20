@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, Phone, Mail, CreditCard, Calendar } from "lucide-react";
 
@@ -32,6 +33,12 @@ const MyAccount = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Minha Conta | BetVipMax - betvipmax"
+        description="Gerencie sua conta no BetVipMax (betvipmax). Veja seus dados pessoais, chave PIX e informações de perfil em bettvipmax.com!"
+        keywords="betvipmax conta, minha conta betvipmax, perfil betvipmax, vipbetmax perfil"
+        path="/my-account"
+      />
       <div className="flex items-center justify-center min-h-[70vh]">
         <div className="w-full max-w-md p-6 rounded-2xl bg-card border border-border">
           <div className="flex flex-col items-center mb-6">
