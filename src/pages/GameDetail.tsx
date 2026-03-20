@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import SEOHead from "@/components/SEOHead";
 import { games } from "@/data/games";
 import { ArrowLeft, Wallet, Maximize2, Star, Users } from "lucide-react";
 
