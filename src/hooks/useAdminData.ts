@@ -39,6 +39,8 @@ export interface AdminReferral {
   created_at: string;
 }
 
+const PAGE_SIZE = 1000;
+
 export const useAdminData = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -48,26 +50,62 @@ export const useAdminData = () => {
   const [referrals, setReferrals] = useState<AdminReferral[]>([]);
 
   const checkAdmin = useCallback(async () => {
-    if (!user) { setIsAdmin(false); setLoading(false); return; }
+    if (!user) {
+      setIsAdmin(false);
+      setLoading(false);
+      return;
+    }
+
     const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
     setIsAdmin(!!data);
     setLoading(false);
   }, [user]);
 
+  const fetchPaginatedRpc = useCallback(
+    async <T,>(rpcName: "admin_get_all_profiles" | "admin_get_all_transactions" | "admin_get_all_referrals") => {
+      let from = 0;
+      let allRows: T[] = [];
+
+      while (true) {
+        const { data, error } = await supabase
+          .rpc(rpcName)
+          .range(from, from + PAGE_SIZE - 1);
+
+        if (error) throw error;
+
+        const chunk = (data ?? []) as T[];
+        allRows = allRows.concat(chunk);
+
+        if (chunk.length < PAGE_SIZE) break;
+        from += PAGE_SIZE;
+      }
+
+      return allRows;
+    },
+    []
+  );
+
   const fetchAll = useCallback(async () => {
     if (!user) return;
-    const [p, t, r] = await Promise.all([
-      supabase.rpc("admin_get_all_profiles"),
-      supabase.rpc("admin_get_all_transactions"),
-      supabase.rpc("admin_get_all_referrals"),
-    ]);
-    if (p.data) setProfiles(p.data as AdminProfile[]);
-    if (t.data) setTransactions(t.data as AdminTransaction[]);
-    if (r.data) setReferrals(r.data as AdminReferral[]);
-  }, [user]);
 
-  useEffect(() => { checkAdmin(); }, [checkAdmin]);
-  useEffect(() => { if (isAdmin) fetchAll(); }, [isAdmin, fetchAll]);
+    const [allProfiles, allTransactions, allReferrals] = await Promise.all([
+      fetchPaginatedRpc<AdminProfile>("admin_get_all_profiles"),
+      fetchPaginatedRpc<AdminTransaction>("admin_get_all_transactions"),
+      fetchPaginatedRpc<AdminReferral>("admin_get_all_referrals"),
+    ]);
+
+    setProfiles(allProfiles);
+    setTransactions(allTransactions);
+    setReferrals(allReferrals);
+  }, [user, fetchPaginatedRpc]);
+
+  useEffect(() => {
+    checkAdmin();
+  }, [checkAdmin]);
+
+  useEffect(() => {
+    if (isAdmin) fetchAll();
+  }, [isAdmin, fetchAll]);
 
   const updateBalance = async (targetUserId: string, newBalance: number) => {
     const { error } = await supabase.rpc("admin_update_balance", {
