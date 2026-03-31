@@ -75,10 +75,10 @@ export const useAdminData = () => {
         if (error) throw error;
 
         const chunk = (data ?? []) as T[];
-        allRows = allRows.concat(chunk);
+        if (chunk.length === 0) break;
 
-        if (chunk.length < PAGE_SIZE) break;
-        offset += PAGE_SIZE;
+        allRows = allRows.concat(chunk);
+        offset += chunk.length;
       }
 
       return allRows;
