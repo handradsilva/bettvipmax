@@ -39,7 +39,7 @@ export interface AdminReferral {
   created_at: string;
 }
 
-const PAGE_SIZE = 1000;
+const PAGE_SIZE = 5000;
 
 export const useAdminData = () => {
   const { user } = useAuth();
