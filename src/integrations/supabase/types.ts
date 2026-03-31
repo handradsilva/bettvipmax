@@ -148,67 +148,131 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      admin_get_all_profiles: {
-        Args: never
-        Returns: {
-          affiliate_approved: boolean
-          balance: number
-          cpf: string | null
-          created_at: string
-          email: string
-          id: string
-          phone: string | null
-          pix_key: string | null
-          referral_code: string | null
-          referred_by: string | null
-          updated_at: string
-          user_id: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      admin_get_all_referrals: {
-        Args: never
-        Returns: {
-          commission_amount: number | null
-          created_at: string
-          id: string
-          referred_user_id: string
-          referrer_user_id: string
-          status: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "referrals"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      admin_get_all_transactions: {
-        Args: never
-        Returns: {
-          amount: number
-          brcode: string | null
-          created_at: string
-          gateway_ref: string | null
-          id: string
-          qrcode_image: string | null
-          status: string
-          type: string
-          updated_at: string
-          user_id: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "transactions"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
+      admin_get_all_profiles:
+        | {
+            Args: never
+            Returns: {
+              affiliate_approved: boolean
+              balance: number
+              cpf: string | null
+              created_at: string
+              email: string
+              id: string
+              phone: string | null
+              pix_key: string | null
+              referral_code: string | null
+              referred_by: string | null
+              updated_at: string
+              user_id: string
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "profiles"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
+        | {
+            Args: { _limit?: number; _offset?: number }
+            Returns: {
+              affiliate_approved: boolean
+              balance: number
+              cpf: string | null
+              created_at: string
+              email: string
+              id: string
+              phone: string | null
+              pix_key: string | null
+              referral_code: string | null
+              referred_by: string | null
+              updated_at: string
+              user_id: string
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "profiles"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
+      admin_get_all_referrals:
+        | {
+            Args: never
+            Returns: {
+              commission_amount: number | null
+              created_at: string
+              id: string
+              referred_user_id: string
+              referrer_user_id: string
+              status: string
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "referrals"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
+        | {
+            Args: { _limit?: number; _offset?: number }
+            Returns: {
+              commission_amount: number | null
+              created_at: string
+              id: string
+              referred_user_id: string
+              referrer_user_id: string
+              status: string
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "referrals"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
+      admin_get_all_transactions:
+        | {
+            Args: never
+            Returns: {
+              amount: number
+              brcode: string | null
+              created_at: string
+              gateway_ref: string | null
+              id: string
+              qrcode_image: string | null
+              status: string
+              type: string
+              updated_at: string
+              user_id: string
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "transactions"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
+        | {
+            Args: { _limit?: number; _offset?: number }
+            Returns: {
+              amount: number
+              brcode: string | null
+              created_at: string
+              gateway_ref: string | null
+              id: string
+              qrcode_image: string | null
+              status: string
+              type: string
+              updated_at: string
+              user_id: string
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "transactions"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
       admin_toggle_affiliate: {
         Args: { _approved: boolean; _target_user_id: string }
         Returns: undefined
