@@ -63,13 +63,14 @@ export const useAdminData = () => {
 
   const fetchPaginatedRpc = useCallback(
     async <T,>(rpcName: "admin_get_all_profiles" | "admin_get_all_transactions" | "admin_get_all_referrals") => {
-      let from = 0;
+      let offset = 0;
       let allRows: T[] = [];
 
       while (true) {
-        const { data, error } = await supabase
-          .rpc(rpcName)
-          .range(from, from + PAGE_SIZE - 1);
+        const { data, error } = await supabase.rpc(rpcName, {
+          _offset: offset,
+          _limit: PAGE_SIZE,
+        });
 
         if (error) throw error;
 
@@ -77,7 +78,7 @@ export const useAdminData = () => {
         allRows = allRows.concat(chunk);
 
         if (chunk.length < PAGE_SIZE) break;
-        from += PAGE_SIZE;
+        offset += PAGE_SIZE;
       }
 
       return allRows;
