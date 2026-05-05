@@ -98,6 +98,28 @@ Deno.serve(async (req) => {
     }
 
     console.log(`Transaction ${transaction.id} updated to ${newStatus}`);
+
+    // Pushcut notification on confirmed deposits
+    if (newStatus === "completed" && transaction.type === "deposit") {
+      const pushcutUrl =
+        Deno.env.get("PUSHCUT_WEBHOOK_URL") ||
+        "https://api.pushcut.io/y4E0mGDl6y0B2KCvVdncD/notifications/Purschase";
+      try {
+        const pcRes = await fetch(pushcutUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "💰 Novo depósito confirmado",
+            text: `R$ ${Number(transaction.amount).toFixed(2)} - ref ${gatewayRef}`,
+            input: String(transaction.amount),
+          }),
+        });
+        console.log("Pushcut notify status:", pcRes.status);
+      } catch (e) {
+        console.error("Pushcut notify error:", e);
+      }
+    }
+
     return new Response(JSON.stringify({ success: true, status: newStatus }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
