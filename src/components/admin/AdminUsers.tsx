@@ -40,8 +40,12 @@ const AdminUsers = ({ profiles, transactions = [] }: Props) => {
       })
       .filter((p) => {
         if (!search) return true;
-        const q = search.toLowerCase();
-        return p.email.toLowerCase().includes(q) || (p.cpf || "").toLowerCase().includes(q);
+        const q = search.toLowerCase().trim();
+        const qDigits = q.replace(/\D/g, "");
+        const cpfDigits = (p.cpf || "").replace(/\D/g, "");
+        const emailMatch = p.email.toLowerCase().includes(q);
+        const cpfMatch = qDigits.length > 0 && cpfDigits.includes(qDigits);
+        return emailMatch || cpfMatch;
       });
   }, [profiles, search, startDate, endDate]);
 
