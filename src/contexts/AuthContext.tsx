@@ -19,7 +19,7 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, phone?: string, cpf?: string, ref?: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, phone?: string, cpf?: string, ref?: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -72,19 +72,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, phone?: string, cpf?: string, ref?: string) => {
+  const signUp = async (email: string, password: string, phone?: string, cpf?: string, ref?: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
+        data: { full_name: fullName },
       },
     });
 
     if (!error && data.user) {
-      // Update profile with phone, cpf, and referred_by
+      // Update profile with name, phone, cpf, and referred_by
       setTimeout(async () => {
-        const updateData: Record<string, any> = { phone, cpf };
+        const updateData: Record<string, any> = { phone, cpf, full_name: fullName };
         if (ref) {
           updateData.referred_by = ref;
         }
