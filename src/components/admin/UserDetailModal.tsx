@@ -61,6 +61,7 @@ const UserDetailModal = ({ user, profiles, transactions, open, onClose }: Props)
 
           <TabsContent value="profile" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="Nome Completo" value={user.full_name || "—"} />
               <Field label="E-mail" value={user.email} />
               <Field label="Telefone" value={user.phone || "—"} />
               <Field label="CPF" value={user.cpf || "—"} />
@@ -76,7 +77,7 @@ const UserDetailModal = ({ user, profiles, transactions, open, onClose }: Props)
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <SummaryCard
                 title="Saldo Atual"
-                value={formatBRL(Number(user.balance))}
+                value={formatBRL(totalDeposited)}
                 icon={Wallet}
                 accent="text-primary"
               />
