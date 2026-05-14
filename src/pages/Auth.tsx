@@ -158,9 +158,11 @@ const Auth = () => {
                 <label className="block text-sm font-medium text-foreground mb-1">Chave PIX para saques (CPF)</label>
                 <input
                   type="text"
+                  inputMode="numeric"
                   value={cpf}
-                  onChange={(e) => setCpf(e.target.value)}
+                  onChange={(e) => setCpf(formatCPF(e.target.value))}
                   placeholder="000.000.000-00"
+                  maxLength={14}
                   className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base"
                   required
                 />
