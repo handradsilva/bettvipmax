@@ -50,6 +50,11 @@ const Auth = () => {
 
     try {
       if (isRegister) {
+        if (!isValidCPF(cpf)) {
+          toast({ title: "CPF inválido", description: "Digite um CPF real válido para concluir o cadastro.", variant: "destructive" });
+          setLoading(false);
+          return;
+        }
         const { error } = await signUp(email, password, phone, cpf, ref, fullName);
         if (error) {
           toast({ title: "Erro no cadastro", description: error.message, variant: "destructive" });
