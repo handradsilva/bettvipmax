@@ -1,18 +1,17 @@
+## Objetivo
 
+Permitir que o campo de busca em **Admin → Usuários** filtre também pelo **nome completo** do lead, além de e-mail e CPF.
 
-## Problema
-Existem **duas versões** de cada função no banco — uma sem parâmetros (com `LIMIT 10000`) e outra com `_offset/_limit`. O Supabase pode estar chamando a versão sem parâmetros, limitando a 10.000 registros.
+## Alterações
 
-## Solução
-1. **Dropar as versões sem parâmetros** das 3 funções (`admin_get_all_profiles()`, `admin_get_all_transactions()`, `admin_get_all_referrals()`) para garantir que apenas as versões paginadas sejam usadas.
+**`src/components/admin/AdminUsers.tsx`**
+- No filtro `useMemo`, adicionar match contra `p.full_name` (case-insensitive, ignorando acentos opcionalmente).
+- Atualizar o `placeholder` do input para: `"Buscar por nome, e-mail ou CPF..."`.
 
-2. **Aumentar o cap por página** de 1000 para 5000 nas versões paginadas (acelera a busca, menos round-trips).
+Lógica do filtro:
+```ts
+const nameMatch = (p.full_name || "").toLowerCase().includes(q);
+return emailMatch || cpfMatch || nameMatch;
+```
 
-3. O frontend (`useAdminData.ts`) já faz loop até esgotar os dados — isso garante leitura **ilimitada** independente do tamanho do banco.
-
-## Arquivo modificado
-- **Migration SQL**: `DROP FUNCTION` das versões sem parâmetros + `CREATE OR REPLACE` das paginadas com cap de 5000.
-
-## Resultado
-Leitura efetivamente ilimitada: o frontend busca 5000 por vez até trazer 100% dos registros.
-
+Nada mais é alterado — backend, colunas da tabela e demais filtros permanecem iguais.
