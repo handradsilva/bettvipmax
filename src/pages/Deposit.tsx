@@ -238,12 +238,17 @@ const Deposit = () => {
                   </div>
 
                   {paymentStatus === "waiting" && (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-                      <p className="text-sm text-muted-foreground animate-pulse">
-                        Aguardando pagamento... ({remainingMinutes} min restantes)
+                    <>
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                        <p className="text-sm text-muted-foreground animate-pulse">
+                          Aguardando pagamento... ({remainingMinutes} min restantes)
+                        </p>
+                      </div>
+                      <p className="text-xs text-amber-400 font-medium px-2">
+                        ⏱️ Após realizar o pagamento, aguarde até 30 segundos para o banco confirmar o depósito.
                       </p>
-                    </div>
+                    </>
                   )}
 
                   {paymentStatus === "expired" && (
