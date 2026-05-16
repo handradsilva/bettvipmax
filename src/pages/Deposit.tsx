@@ -13,8 +13,8 @@ const presetValues = [
   { label: "R$ 100", value: 100, border: "4px" },
 ];
 
-const POLL_INTERVAL = 5000;
-const MAX_POLLS = 120; // 10 minutes
+const POLL_INTERVAL = 2000;
+const MAX_POLLS = 300; // 10 minutes (300 * 2s)
 
 const Deposit = () => {
   const { user, profile, refreshProfile } = useAuth();
