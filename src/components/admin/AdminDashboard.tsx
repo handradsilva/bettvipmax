@@ -128,7 +128,19 @@ const AdminDashboard = ({ profiles, transactions, referrals, refetch }: Props) =
 
   return (
     <div className="space-y-6">
-      <AdminDateFilter startDate={startDate} endDate={endDate} onStartChange={setStartDate} onEndChange={setEndDate} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <AdminDateFilter startDate={startDate} endDate={endDate} onStartChange={setStartDate} onEndChange={setEndDate} />
+        <Button
+          onClick={handleReconcile}
+          disabled={reconciling}
+          size="sm"
+          variant="secondary"
+          className="gap-2"
+        >
+          <RefreshCw size={14} className={reconciling ? "animate-spin" : ""} />
+          {reconciling ? "Reconciliando..." : "Reconciliar PIX (72h)"}
+        </Button>
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {metrics.map((m, i) => (
