@@ -1,22 +1,46 @@
 import { useState, useMemo } from "react";
-import { Users, DollarSign, QrCode, UserPlus, TrendingUp, Filter } from "lucide-react";
+import { Users, DollarSign, QrCode, UserPlus, TrendingUp, Filter, RefreshCw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { format, parseISO, isToday, isWithinInterval, startOfDay, endOfDay, eachDayOfInterval, subDays } from "date-fns";
 import type { AdminProfile, AdminTransaction, AdminReferral } from "@/hooks/useAdminData";
 import AdminDateFilter from "./AdminDateFilter";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 interface Props {
   profiles: AdminProfile[];
   transactions: AdminTransaction[];
   referrals: AdminReferral[];
+  refetch: () => Promise<void> | void;
 }
 
 
 
 
-const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
+const AdminDashboard = ({ profiles, transactions, referrals, refetch }: Props) => {
   const [startDate, setStartDate] = useState<Date>(new Date(2026, 0, 1));
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [reconciling, setReconciling] = useState(false);
+
+  const handleReconcile = async () => {
+    setReconciling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("reconcile-deposits", {
+        body: { hours: 72 },
+      });
+      if (error) throw error;
+      toast.success(
+        `Reconciliação: ${data.completed} confirmados, ${data.still_pending} ainda pendentes, ${data.failed} falhas (${data.checked} verificados)`
+      );
+      await refetch();
+    } catch (e: any) {
+      toast.error("Erro ao reconciliar: " + (e?.message ?? "desconhecido"));
+    } finally {
+      setReconciling(false);
+    }
+  };
+
 
   const filtered = useMemo(() => {
     const s = startOfDay(startDate);
@@ -104,7 +128,19 @@ const AdminDashboard = ({ profiles, transactions, referrals }: Props) => {
 
   return (
     <div className="space-y-6">
-      <AdminDateFilter startDate={startDate} endDate={endDate} onStartChange={setStartDate} onEndChange={setEndDate} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <AdminDateFilter startDate={startDate} endDate={endDate} onStartChange={setStartDate} onEndChange={setEndDate} />
+        <Button
+          onClick={handleReconcile}
+          disabled={reconciling}
+          size="sm"
+          variant="secondary"
+          className="gap-2"
+        >
+          <RefreshCw size={14} className={reconciling ? "animate-spin" : ""} />
+          {reconciling ? "Reconciliando..." : "Reconciliar PIX (72h)"}
+        </Button>
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {metrics.map((m, i) => (
