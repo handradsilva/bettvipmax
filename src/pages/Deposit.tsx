@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import Layout from "@/components/Layout";
 import SEOHead from "@/components/SEOHead";
@@ -19,6 +19,7 @@ const MAX_POLLS = 300; // 10 minutes (300 * 2s)
 const Deposit = () => {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [amount, setAmount] = useState("");
   const [wantBonus, setWantBonus] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,11 @@ const Deposit = () => {
   const [paymentStatus, setPaymentStatus] = useState<"waiting" | "confirmed" | "expired" | null>(null);
   const [pollCount, setPollCount] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Scroll to top on mount so mobile users see the deposit section
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Cleanup polling on unmount
   useEffect(() => {
