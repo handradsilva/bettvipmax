@@ -19,6 +19,7 @@ const MAX_POLLS = 300; // 10 minutes (300 * 2s)
 const Deposit = () => {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [amount, setAmount] = useState("");
   const [wantBonus, setWantBonus] = useState(false);
   const [loading, setLoading] = useState(false);
