@@ -30,6 +30,11 @@ const Deposit = () => {
   const [pollCount, setPollCount] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Scroll to top on mount so mobile users see the deposit section
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   // Cleanup polling on unmount
   useEffect(() => {
     return () => {
