@@ -20,30 +20,51 @@ interface Settings {
   whatsapp_template: string;
   delay_hours: number;
   provider: string;
+  activation_date: string | null;
+}
+
+interface Funnel {
+  total_no_deposit: number;
+  messaged: number;
+  clicked: number;
+  clicked_and_deposited: number;
 }
 
 const AdminRemarketing = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [funnel, setFunnel] = useState<Funnel | null>(null);
   const [settings, setSettings] = useState<Settings>({
     whatsapp_enabled: false,
     whatsapp_template: "",
     delay_hours: 1,
     provider: "zapi",
+    activation_date: null,
   });
+
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
     setLoading(true);
-    const [leadsRes, settingsRes] = await Promise.all([
+    const [leadsRes, settingsRes, funnelRes] = await Promise.all([
       (supabase as any).rpc("admin_get_leads_without_deposit", { _min_hours: 1 }),
       (supabase as any).from("remarketing_settings").select("*").eq("id", 1).maybeSingle(),
+      (supabase as any).rpc("admin_get_remarketing_funnel"),
     ]);
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
     else setLeads((leadsRes.data as Lead[]) || []);
     if (settingsRes.data) setSettings(settingsRes.data as Settings);
+    if (funnelRes.data && funnelRes.data[0]) {
+      const f = funnelRes.data[0];
+      setFunnel({
+        total_no_deposit: Number(f.total_no_deposit) || 0,
+        messaged: Number(f.messaged) || 0,
+        clicked: Number(f.clicked) || 0,
+        clicked_and_deposited: Number(f.clicked_and_deposited) || 0,
+      });
+    }
   };
 
   useEffect(() => {
@@ -57,11 +78,30 @@ const AdminRemarketing = () => {
       _template: settings.whatsapp_template,
       _delay_hours: settings.delay_hours,
       _provider: settings.provider,
+      _activation_date: settings.activation_date,
     });
     setSaving(false);
     if (error) toast.error("Erro: " + error.message);
     else toast.success("Configurações salvas");
   };
+
+  const activateNow = async () => {
+    const now = new Date().toISOString();
+    setSettings((s) => ({ ...s, activation_date: now }));
+    const { error } = await (supabase as any).rpc("admin_update_remarketing_settings", {
+      _enabled: settings.whatsapp_enabled,
+      _template: settings.whatsapp_template,
+      _delay_hours: settings.delay_hours,
+      _provider: settings.provider,
+      _activation_date: now,
+    });
+    if (error) toast.error("Erro: " + error.message);
+    else {
+      toast.success("Ativado! Só leads a partir de agora receberão.");
+      load();
+    }
+  };
+
 
   const triggerNow = async () => {
     setSending(true);
@@ -114,6 +154,10 @@ const AdminRemarketing = () => {
         <MetricCard label="Sem telefone" value={noPhone} />
       </div>
 
+      {funnel && <FunnelChart funnel={funnel} />}
+
+
+
       <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <MessageCircle size={14} className="text-primary" /> Configurações do WhatsApp automático
@@ -155,7 +199,7 @@ const AdminRemarketing = () => {
 
         <div>
           <label className="text-xs text-muted-foreground">
-            Template da mensagem (variáveis: <code>{"{nome}"}</code>, <code>{"{email}"}</code>)
+            Template da mensagem (variáveis: <code>{"{nome}"}</code>, <code>{"{email}"}</code>, <code>{"{link}"}</code> — link rastreado)
           </label>
           <Textarea
             rows={5}
@@ -163,6 +207,23 @@ const AdminRemarketing = () => {
             onChange={(e) => setSettings({ ...settings, whatsapp_template: e.target.value })}
           />
         </div>
+
+        <div className="p-3 rounded-lg bg-secondary/40 border border-border space-y-2">
+          <p className="text-xs text-muted-foreground">
+            <strong className="text-foreground">Data de ativação:</strong>{" "}
+            {settings.activation_date
+              ? new Date(settings.activation_date).toLocaleString("pt-BR")
+              : "❌ não ativado (nenhum lead receberá até você ativar)"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Após ativar, apenas leads cadastrados a partir da data acima receberão o WhatsApp automático.
+            Leads antigos são ignorados.
+          </p>
+          <Button size="sm" variant="outline" onClick={activateNow}>
+            {settings.activation_date ? "Redefinir ativação para agora" : "Ativar agora (começar disparos)"}
+          </Button>
+        </div>
+
 
         <div className="flex flex-wrap gap-2">
           <Button onClick={saveSettings} disabled={saving} size="sm">
@@ -246,5 +307,74 @@ const MetricCard = ({ label, value, highlight }: { label: string; value: number;
     <p className={`text-xl font-bold mt-1 ${highlight ? "text-primary" : "text-foreground"}`}>{value}</p>
   </div>
 );
+
+const FunnelChart = ({ funnel }: { funnel: Funnel }) => {
+  const total = Math.max(funnel.total_no_deposit, 1);
+  const pct = (n: number) => Math.round((n / total) * 100);
+  const steps = [
+    {
+      label: "Leads sem depósito (base)",
+      value: funnel.total_no_deposit,
+      pct: 100,
+      color: "bg-muted-foreground/40",
+      sub: "Total desde a ativação",
+    },
+    {
+      label: "Receberam WhatsApp (1h+)",
+      value: funnel.messaged,
+      pct: pct(funnel.messaged),
+      color: "bg-emerald-500",
+      sub: `${pct(funnel.messaged)}% dos leads sem depósito`,
+    },
+    {
+      label: "Clicaram no link",
+      value: funnel.clicked,
+      pct: pct(funnel.clicked),
+      color: "bg-primary",
+      sub:
+        funnel.messaged > 0
+          ? `${Math.round((funnel.clicked / funnel.messaged) * 100)}% de CTR sobre enviados`
+          : "—",
+    },
+    {
+      label: "Depositaram após clicar",
+      value: funnel.clicked_and_deposited,
+      pct: pct(funnel.clicked_and_deposited),
+      color: "bg-amber-500",
+      sub:
+        funnel.clicked > 0
+          ? `${Math.round((funnel.clicked_and_deposited / funnel.clicked) * 100)}% conversão pós-clique`
+          : "—",
+    },
+  ];
+
+  return (
+    <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
+      <h3 className="text-sm font-semibold text-foreground">📊 Funil de remarketing</h3>
+      <div className="space-y-3">
+        {steps.map((s) => (
+          <div key={s.label} className="space-y-1">
+            <div className="flex justify-between items-baseline text-xs">
+              <span className="text-foreground font-medium">{s.label}</span>
+              <span className="text-muted-foreground">
+                <strong className="text-foreground">{s.value.toLocaleString("pt-BR")}</strong> · {s.pct}%
+              </span>
+            </div>
+            <div className="h-6 rounded-md bg-secondary overflow-hidden">
+              <div
+                className={`h-full ${s.color} transition-all flex items-center justify-end pr-2`}
+                style={{ width: `${Math.max(s.pct, 2)}%` }}
+              >
+                <span className="text-[10px] font-semibold text-background">{s.pct}%</span>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground">{s.sub}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 
 export default AdminRemarketing;
