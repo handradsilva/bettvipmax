@@ -282,7 +282,7 @@ const AdminRemarketing = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {leads.slice(0, 200).map((l) => (
+              {filteredLeads.slice(0, 200).map((l) => (
                 <tr key={l.user_id} className="hover:bg-secondary/30">
                   <td className="px-3 py-2 text-foreground">{l.email}</td>
                   <td className="px-3 py-2 text-muted-foreground">{l.full_name || "—"}</td>
@@ -301,19 +301,19 @@ const AdminRemarketing = () => {
                   </td>
                 </tr>
               ))}
-              {leads.length === 0 && !loading && (
+              {filteredLeads.length === 0 && !loading && (
                 <tr>
                   <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    Nenhum lead elegível no momento
+                    Nenhum lead no período selecionado
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        {leads.length > 200 && (
+        {filteredLeads.length > 200 && (
           <p className="text-xs text-muted-foreground p-3 text-center">
-            Mostrando 200 de {leads.length}. Exporte o CSV para ver todos.
+            Mostrando 200 de {filteredLeads.length}. Exporte o CSV para ver todos.
           </p>
         )}
       </div>
