@@ -94,11 +94,17 @@ Deno.serve(async (req) => {
     const delayHours = Number(settings.delay_hours) || 1;
     const template = settings.whatsapp_template as string;
     const provider = settings.provider as string;
+    const activationDate = settings.activation_date as string | null;
 
     // Cutoffs
     const cutoffEnd = new Date(Date.now() - delayHours * 3600 * 1000).toISOString();
     // Only look 7 days back to avoid spamming old leads
-    const cutoffStart = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+    const defaultStart = new Date(Date.now() - 7 * 24 * 3600 * 1000);
+    const activationStart = activationDate ? new Date(activationDate) : null;
+    const cutoffStart = (activationStart && activationStart > defaultStart
+      ? activationStart
+      : defaultStart
+    ).toISOString();
 
     // Fetch candidate leads
     const { data: candidates, error: candErr } = await supabase
@@ -106,6 +112,7 @@ Deno.serve(async (req) => {
       .select("user_id, email, full_name, phone, created_at")
       .lte("created_at", cutoffEnd)
       .gte("created_at", cutoffStart);
+
 
     if (candErr) throw candErr;
 
