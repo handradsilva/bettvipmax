@@ -105,8 +105,8 @@ const AdminPromoCodes = () => {
             Criar
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Link gerado: <span className="text-primary">https://bettvipmax.com/promo/{code || "SEUCODIGO"}</span>
+        <p className="text-xs text-muted-foreground break-all">
+          Link gerado: <span className="text-primary">{window.location.origin}/promo/{code || "SEUCODIGO"}</span>
         </p>
       </div>
 
