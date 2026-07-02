@@ -20,6 +20,25 @@ const Promo = () => {
         return;
       }
 
+      // Track click (fire-and-forget). Params: ?u=<user_id>&c=<campaign_key>&s=<source>
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const u = params.get("u");
+        const c = params.get("c");
+        const s = params.get("s") || (c ? "whatsapp" : "direct");
+        await (supabase as any).from("promo_clicks").insert({
+          promo_code: code,
+          user_id: u || null,
+          campaign_key: c || null,
+          source: s,
+          user_agent: navigator.userAgent,
+          referrer: document.referrer || null,
+        });
+      } catch (_) {
+        // ignore tracking errors
+      }
+
+
       const { data } = await supabase
         .from("promo_codes")
         .select("code, bonus_percent, active, expires_at, max_uses, used_count")
