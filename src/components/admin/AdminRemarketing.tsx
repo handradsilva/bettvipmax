@@ -47,14 +47,24 @@ const AdminRemarketing = () => {
 
   const load = async () => {
     setLoading(true);
-    const [leadsRes, settingsRes] = await Promise.all([
+    const [leadsRes, settingsRes, funnelRes] = await Promise.all([
       (supabase as any).rpc("admin_get_leads_without_deposit", { _min_hours: 1 }),
       (supabase as any).from("remarketing_settings").select("*").eq("id", 1).maybeSingle(),
+      (supabase as any).rpc("admin_get_remarketing_funnel"),
     ]);
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
     else setLeads((leadsRes.data as Lead[]) || []);
     if (settingsRes.data) setSettings(settingsRes.data as Settings);
+    if (funnelRes.data && funnelRes.data[0]) {
+      const f = funnelRes.data[0];
+      setFunnel({
+        total_no_deposit: Number(f.total_no_deposit) || 0,
+        messaged: Number(f.messaged) || 0,
+        clicked: Number(f.clicked) || 0,
+        clicked_and_deposited: Number(f.clicked_and_deposited) || 0,
+      });
+    }
   };
 
   useEffect(() => {
@@ -68,11 +78,30 @@ const AdminRemarketing = () => {
       _template: settings.whatsapp_template,
       _delay_hours: settings.delay_hours,
       _provider: settings.provider,
+      _activation_date: settings.activation_date,
     });
     setSaving(false);
     if (error) toast.error("Erro: " + error.message);
     else toast.success("Configurações salvas");
   };
+
+  const activateNow = async () => {
+    const now = new Date().toISOString();
+    setSettings((s) => ({ ...s, activation_date: now }));
+    const { error } = await (supabase as any).rpc("admin_update_remarketing_settings", {
+      _enabled: settings.whatsapp_enabled,
+      _template: settings.whatsapp_template,
+      _delay_hours: settings.delay_hours,
+      _provider: settings.provider,
+      _activation_date: now,
+    });
+    if (error) toast.error("Erro: " + error.message);
+    else {
+      toast.success("Ativado! Só leads a partir de agora receberão.");
+      load();
+    }
+  };
+
 
   const triggerNow = async () => {
     setSending(true);
