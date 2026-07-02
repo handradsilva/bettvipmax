@@ -308,4 +308,73 @@ const MetricCard = ({ label, value, highlight }: { label: string; value: number;
   </div>
 );
 
+const FunnelChart = ({ funnel }: { funnel: Funnel }) => {
+  const total = Math.max(funnel.total_no_deposit, 1);
+  const pct = (n: number) => Math.round((n / total) * 100);
+  const steps = [
+    {
+      label: "Leads sem depósito (base)",
+      value: funnel.total_no_deposit,
+      pct: 100,
+      color: "bg-muted-foreground/40",
+      sub: "Total desde a ativação",
+    },
+    {
+      label: "Receberam WhatsApp (1h+)",
+      value: funnel.messaged,
+      pct: pct(funnel.messaged),
+      color: "bg-emerald-500",
+      sub: `${pct(funnel.messaged)}% dos leads sem depósito`,
+    },
+    {
+      label: "Clicaram no link",
+      value: funnel.clicked,
+      pct: pct(funnel.clicked),
+      color: "bg-primary",
+      sub:
+        funnel.messaged > 0
+          ? `${Math.round((funnel.clicked / funnel.messaged) * 100)}% de CTR sobre enviados`
+          : "—",
+    },
+    {
+      label: "Depositaram após clicar",
+      value: funnel.clicked_and_deposited,
+      pct: pct(funnel.clicked_and_deposited),
+      color: "bg-amber-500",
+      sub:
+        funnel.clicked > 0
+          ? `${Math.round((funnel.clicked_and_deposited / funnel.clicked) * 100)}% conversão pós-clique`
+          : "—",
+    },
+  ];
+
+  return (
+    <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
+      <h3 className="text-sm font-semibold text-foreground">📊 Funil de remarketing</h3>
+      <div className="space-y-3">
+        {steps.map((s) => (
+          <div key={s.label} className="space-y-1">
+            <div className="flex justify-between items-baseline text-xs">
+              <span className="text-foreground font-medium">{s.label}</span>
+              <span className="text-muted-foreground">
+                <strong className="text-foreground">{s.value.toLocaleString("pt-BR")}</strong> · {s.pct}%
+              </span>
+            </div>
+            <div className="h-6 rounded-md bg-secondary overflow-hidden">
+              <div
+                className={`h-full ${s.color} transition-all flex items-center justify-end pr-2`}
+                style={{ width: `${Math.max(s.pct, 2)}%` }}
+              >
+                <span className="text-[10px] font-semibold text-background">{s.pct}%</span>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground">{s.sub}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
 export default AdminRemarketing;
