@@ -62,6 +62,39 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_clicks: {
+        Row: {
+          campaign_key: string | null
+          created_at: string
+          id: string
+          promo_code: string
+          referrer: string | null
+          source: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          campaign_key?: string | null
+          created_at?: string
+          id?: string
+          promo_code: string
+          referrer?: string | null
+          source?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          campaign_key?: string | null
+          created_at?: string
+          id?: string
+          promo_code?: string
+          referrer?: string | null
+          source?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       promo_codes: {
         Row: {
           active: boolean
@@ -127,6 +160,7 @@ export type Database = {
       }
       remarketing_settings: {
         Row: {
+          activation_date: string | null
           delay_hours: number
           id: number
           provider: string
@@ -135,6 +169,7 @@ export type Database = {
           whatsapp_template: string
         }
         Insert: {
+          activation_date?: string | null
           delay_hours?: number
           id?: number
           provider?: string
@@ -143,6 +178,7 @@ export type Database = {
           whatsapp_template?: string
         }
         Update: {
+          activation_date?: string | null
           delay_hours?: number
           id?: number
           provider?: string
@@ -347,6 +383,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_get_remarketing_funnel: {
+        Args: never
+        Returns: {
+          clicked: number
+          clicked_and_deposited: number
+          messaged: number
+          total_no_deposit: number
+        }[]
+      }
       admin_toggle_affiliate: {
         Args: { _approved: boolean; _target_user_id: string }
         Returns: undefined
@@ -355,15 +400,26 @@ export type Database = {
         Args: { _new_balance: number; _target_user_id: string }
         Returns: undefined
       }
-      admin_update_remarketing_settings: {
-        Args: {
-          _delay_hours: number
-          _enabled: boolean
-          _provider: string
-          _template: string
-        }
-        Returns: undefined
-      }
+      admin_update_remarketing_settings:
+        | {
+            Args: {
+              _delay_hours: number
+              _enabled: boolean
+              _provider: string
+              _template: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _activation_date?: string
+              _delay_hours: number
+              _enabled: boolean
+              _provider: string
+              _template: string
+            }
+            Returns: undefined
+          }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
