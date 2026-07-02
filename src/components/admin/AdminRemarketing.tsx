@@ -46,6 +46,16 @@ const AdminRemarketing = () => {
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
+  const filteredLeads = useMemo(() => {
+    const s = startOfDay(startDate);
+    const e = endOfDay(endDate);
+    return leads.filter((l) =>
+      isWithinInterval(parseISO(l.created_at), { start: s, end: e })
+    );
+  }, [leads, startDate, endDate]);
 
   const load = async () => {
     setLoading(true);
