@@ -199,7 +199,7 @@ const AdminRemarketing = () => {
 
         <div>
           <label className="text-xs text-muted-foreground">
-            Template da mensagem (variáveis: <code>{"{nome}"}</code>, <code>{"{email}"}</code>)
+            Template da mensagem (variáveis: <code>{"{nome}"}</code>, <code>{"{email}"}</code>, <code>{"{link}"}</code> — link rastreado)
           </label>
           <Textarea
             rows={5}
@@ -207,6 +207,23 @@ const AdminRemarketing = () => {
             onChange={(e) => setSettings({ ...settings, whatsapp_template: e.target.value })}
           />
         </div>
+
+        <div className="p-3 rounded-lg bg-secondary/40 border border-border space-y-2">
+          <p className="text-xs text-muted-foreground">
+            <strong className="text-foreground">Data de ativação:</strong>{" "}
+            {settings.activation_date
+              ? new Date(settings.activation_date).toLocaleString("pt-BR")
+              : "❌ não ativado (nenhum lead receberá até você ativar)"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Após ativar, apenas leads cadastrados a partir da data acima receberão o WhatsApp automático.
+            Leads antigos são ignorados.
+          </p>
+          <Button size="sm" variant="outline" onClick={activateNow}>
+            {settings.activation_date ? "Redefinir ativação para agora" : "Ativar agora (começar disparos)"}
+          </Button>
+        </div>
+
 
         <div className="flex flex-wrap gap-2">
           <Button onClick={saveSettings} disabled={saving} size="sm">
