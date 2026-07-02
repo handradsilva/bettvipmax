@@ -136,7 +136,7 @@ const AdminRemarketing = () => {
   const exportCsv = () => {
     const rows = [
       ["email", "nome", "telefone", "cadastro", "ja_enviado"],
-      ...leads.map((l) => [
+      ...filteredLeads.map((l) => [
         l.email,
         l.full_name || "",
         l.phone || "",
@@ -154,15 +154,27 @@ const AdminRemarketing = () => {
     URL.revokeObjectURL(url);
   };
 
-  const eligible = leads.filter((l) => !l.already_messaged && l.phone);
-  const noPhone = leads.filter((l) => !l.phone).length;
+  const eligible = filteredLeads.filter((l) => !l.already_messaged && l.phone);
+  const noPhone = filteredLeads.filter((l) => !l.phone).length;
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <AdminDateFilter
+          startDate={startDate}
+          endDate={endDate}
+          onStartChange={setStartDate}
+          onEndChange={setEndDate}
+        />
+        <p className="text-[11px] text-muted-foreground">
+          Filtro aplicado aos leads e métricas abaixo. Funil considera desde a ativação.
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <MetricCard label="Leads sem depósito" value={leads.length} />
+        <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
         <MetricCard label="Prontos para envio" value={eligible.length} highlight />
-        <MetricCard label="Já receberam WhatsApp" value={leads.filter((l) => l.already_messaged).length} />
+        <MetricCard label="Já receberam WhatsApp" value={filteredLeads.filter((l) => l.already_messaged).length} />
         <MetricCard label="Sem telefone" value={noPhone} />
       </div>
 
