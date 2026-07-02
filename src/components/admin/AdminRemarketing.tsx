@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, Send, Download, RefreshCw } from "lucide-react";
+import { parseISO, isWithinInterval, startOfDay, endOfDay, subDays } from "date-fns";
+import AdminDateFilter from "./AdminDateFilter";
 
 interface Lead {
   user_id: string;
@@ -44,6 +46,16 @@ const AdminRemarketing = () => {
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
+  const filteredLeads = useMemo(() => {
+    const s = startOfDay(startDate);
+    const e = endOfDay(endDate);
+    return leads.filter((l) =>
+      isWithinInterval(parseISO(l.created_at), { start: s, end: e })
+    );
+  }, [leads, startDate, endDate]);
 
   const load = async () => {
     setLoading(true);
@@ -124,7 +136,7 @@ const AdminRemarketing = () => {
   const exportCsv = () => {
     const rows = [
       ["email", "nome", "telefone", "cadastro", "ja_enviado"],
-      ...leads.map((l) => [
+      ...filteredLeads.map((l) => [
         l.email,
         l.full_name || "",
         l.phone || "",
@@ -142,15 +154,27 @@ const AdminRemarketing = () => {
     URL.revokeObjectURL(url);
   };
 
-  const eligible = leads.filter((l) => !l.already_messaged && l.phone);
-  const noPhone = leads.filter((l) => !l.phone).length;
+  const eligible = filteredLeads.filter((l) => !l.already_messaged && l.phone);
+  const noPhone = filteredLeads.filter((l) => !l.phone).length;
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <AdminDateFilter
+          startDate={startDate}
+          endDate={endDate}
+          onStartChange={setStartDate}
+          onEndChange={setEndDate}
+        />
+        <p className="text-[11px] text-muted-foreground">
+          Filtro aplicado aos leads e métricas abaixo. Funil considera desde a ativação.
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <MetricCard label="Leads sem depósito" value={leads.length} />
+        <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
         <MetricCard label="Prontos para envio" value={eligible.length} highlight />
-        <MetricCard label="Já receberam WhatsApp" value={leads.filter((l) => l.already_messaged).length} />
+        <MetricCard label="Já receberam WhatsApp" value={filteredLeads.filter((l) => l.already_messaged).length} />
         <MetricCard label="Sem telefone" value={noPhone} />
       </div>
 
@@ -258,7 +282,7 @@ const AdminRemarketing = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {leads.slice(0, 200).map((l) => (
+              {filteredLeads.slice(0, 200).map((l) => (
                 <tr key={l.user_id} className="hover:bg-secondary/30">
                   <td className="px-3 py-2 text-foreground">{l.email}</td>
                   <td className="px-3 py-2 text-muted-foreground">{l.full_name || "—"}</td>
@@ -277,19 +301,19 @@ const AdminRemarketing = () => {
                   </td>
                 </tr>
               ))}
-              {leads.length === 0 && !loading && (
+              {filteredLeads.length === 0 && !loading && (
                 <tr>
                   <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    Nenhum lead elegível no momento
+                    Nenhum lead no período selecionado
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        {leads.length > 200 && (
+        {filteredLeads.length > 200 && (
           <p className="text-xs text-muted-foreground p-3 text-center">
-            Mostrando 200 de {leads.length}. Exporte o CSV para ver todos.
+            Mostrando 200 de {filteredLeads.length}. Exporte o CSV para ver todos.
           </p>
         )}
       </div>
