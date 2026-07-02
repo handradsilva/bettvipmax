@@ -28,7 +28,16 @@ const Deposit = () => {
   const [_gatewayRef, setGatewayRef] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<"waiting" | "confirmed" | "expired" | null>(null);
   const [pollCount, setPollCount] = useState(0);
+  const [promoCode, setPromoCode] = useState<string | null>(null);
+  const [promoBonus, setPromoBonus] = useState<number | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const code = localStorage.getItem("promo_code");
+    const bonus = localStorage.getItem("promo_bonus");
+    if (code) setPromoCode(code);
+    if (bonus) setPromoBonus(Number(bonus));
+  }, []);
 
   // Scroll to top on mount so mobile users see the deposit section
   useEffect(() => {
@@ -93,7 +102,7 @@ const Deposit = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-pix", {
-        body: { amount: val, wantBonus },
+        body: { amount: val, wantBonus, promoCode: promoCode || undefined },
       });
 
       if (error) throw error;
@@ -155,7 +164,16 @@ const Deposit = () => {
           className="w-full max-w-md rounded-2xl object-cover"
         />
         <div className="w-full max-w-md p-6 rounded-2xl bg-card border border-border">
-          <h1 className="text-2xl font-bold text-foreground mb-6 text-center">Depositar</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4 text-center">Depositar</h1>
+
+          {promoCode && promoBonus && (
+            <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/40 text-center">
+              <p className="text-xs text-muted-foreground">Bônus especial ativo</p>
+              <p className="text-base font-bold text-primary">
+                🎁 {promoBonus}% de bônus com o código <span className="uppercase">{promoCode}</span>
+              </p>
+            </div>
+          )}
 
           {!qrCode ? (
             <div className="space-y-4">

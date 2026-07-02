@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     }
     const userId = claimsData.claims.sub;
 
-    const { amount, wantBonus } = await req.json();
+    const { amount, wantBonus, promoCode } = await req.json();
     if (!amount || amount < 1) {
       return new Response(JSON.stringify({ error: "Valor mínimo de R$ 1,00" }), {
         status: 400,
@@ -161,6 +161,7 @@ Deno.serve(async (req) => {
       brcode: pixData.qrcode || "",
       qrcode_image: "",
       gateway_ref: pixData.transactionId || "",
+      promo_code: promoCode ? String(promoCode).toUpperCase().slice(0, 32) : null,
     });
 
     if (txError) {
