@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminData } from "@/hooks/useAdminData";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { LayoutDashboard, Users, Wallet, UserCheck, Settings, DollarSign } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, UserCheck, Settings, DollarSign, MessageCircle, Tag } from "lucide-react";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminDeposits from "@/components/admin/AdminDeposits";
 import AdminAffiliates from "@/components/admin/AdminAffiliates";
 import AdminBalance from "@/components/admin/AdminBalance";
 import AdminSettings from "@/components/admin/AdminSettings";
+import AdminRemarketing from "@/components/admin/AdminRemarketing";
+import AdminPromoCodes from "@/components/admin/AdminPromoCodes";
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -42,6 +44,8 @@ const Admin = () => {
 
   const tabs = [
     { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { value: "remarketing", label: "Remarketing", icon: MessageCircle },
+    { value: "promos", label: "Códigos", icon: Tag },
     { value: "affiliates", label: "Afiliados", icon: UserCheck },
     { value: "users", label: "Usuários", icon: Users },
     { value: "deposits", label: "Depósitos", icon: Wallet },
@@ -80,6 +84,12 @@ const Admin = () => {
 
           <TabsContent value="dashboard">
             <AdminDashboard profiles={profiles} transactions={transactions} referrals={referrals} refetch={refetch} />
+          </TabsContent>
+          <TabsContent value="remarketing">
+            <AdminRemarketing />
+          </TabsContent>
+          <TabsContent value="promos">
+            <AdminPromoCodes />
           </TabsContent>
           <TabsContent value="affiliates">
             <AdminAffiliates profiles={profiles} referrals={referrals} transactions={transactions} toggleAffiliate={toggleAffiliate} />
