@@ -62,6 +62,42 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_codes: {
+        Row: {
+          active: boolean
+          bonus_percent: number
+          code: string
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          max_uses: number | null
+          updated_at: string
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          bonus_percent?: number
+          code: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          max_uses?: number | null
+          updated_at?: string
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          bonus_percent?: number
+          code?: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          max_uses?: number | null
+          updated_at?: string
+          used_count?: number
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           commission_amount: number | null
@@ -89,6 +125,33 @@ export type Database = {
         }
         Relationships: []
       }
+      remarketing_settings: {
+        Row: {
+          delay_hours: number
+          id: number
+          provider: string
+          updated_at: string
+          whatsapp_enabled: boolean
+          whatsapp_template: string
+        }
+        Insert: {
+          delay_hours?: number
+          id?: number
+          provider?: string
+          updated_at?: string
+          whatsapp_enabled?: boolean
+          whatsapp_template?: string
+        }
+        Update: {
+          delay_hours?: number
+          id?: number
+          provider?: string
+          updated_at?: string
+          whatsapp_enabled?: boolean
+          whatsapp_template?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -96,6 +159,7 @@ export type Database = {
           created_at: string
           gateway_ref: string | null
           id: string
+          promo_code: string | null
           qrcode_image: string | null
           status: string
           type: string
@@ -108,6 +172,7 @@ export type Database = {
           created_at?: string
           gateway_ref?: string | null
           id?: string
+          promo_code?: string | null
           qrcode_image?: string | null
           status?: string
           type: string
@@ -120,6 +185,7 @@ export type Database = {
           created_at?: string
           gateway_ref?: string | null
           id?: string
+          promo_code?: string | null
           qrcode_image?: string | null
           status?: string
           type?: string
@@ -142,6 +208,42 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_campaigns: {
+        Row: {
+          campaign_key: string
+          error: string | null
+          id: string
+          message: string | null
+          phone: string | null
+          provider_response: Json | null
+          sent_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          campaign_key: string
+          error?: string | null
+          id?: string
+          message?: string | null
+          phone?: string | null
+          provider_response?: Json | null
+          sent_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          campaign_key?: string
+          error?: string | null
+          id?: string
+          message?: string | null
+          phone?: string | null
+          provider_response?: Json | null
+          sent_at?: string
+          status?: string
           user_id?: string
         }
         Relationships: []
@@ -200,6 +302,7 @@ export type Database = {
           created_at: string
           gateway_ref: string | null
           id: string
+          promo_code: string | null
           qrcode_image: string | null
           status: string
           type: string
@@ -213,12 +316,52 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_get_campaigns: {
+        Args: { _limit?: number; _offset?: number }
+        Returns: {
+          campaign_key: string
+          error: string | null
+          id: string
+          message: string | null
+          phone: string | null
+          provider_response: Json | null
+          sent_at: string
+          status: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "whatsapp_campaigns"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_get_leads_without_deposit: {
+        Args: { _min_hours?: number }
+        Returns: {
+          already_messaged: boolean
+          created_at: string
+          email: string
+          full_name: string
+          phone: string
+          user_id: string
+        }[]
+      }
       admin_toggle_affiliate: {
         Args: { _approved: boolean; _target_user_id: string }
         Returns: undefined
       }
       admin_update_balance: {
         Args: { _new_balance: number; _target_user_id: string }
+        Returns: undefined
+      }
+      admin_update_remarketing_settings: {
+        Args: {
+          _delay_hours: number
+          _enabled: boolean
+          _provider: string
+          _template: string
+        }
         Returns: undefined
       }
       has_role: {
