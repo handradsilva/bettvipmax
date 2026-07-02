@@ -20,16 +20,27 @@ interface Settings {
   whatsapp_template: string;
   delay_hours: number;
   provider: string;
+  activation_date: string | null;
+}
+
+interface Funnel {
+  total_no_deposit: number;
+  messaged: number;
+  clicked: number;
+  clicked_and_deposited: number;
 }
 
 const AdminRemarketing = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [funnel, setFunnel] = useState<Funnel | null>(null);
   const [settings, setSettings] = useState<Settings>({
     whatsapp_enabled: false,
     whatsapp_template: "",
     delay_hours: 1,
     provider: "zapi",
+    activation_date: null,
   });
+
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
