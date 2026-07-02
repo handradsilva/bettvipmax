@@ -154,6 +154,10 @@ const AdminRemarketing = () => {
         <MetricCard label="Sem telefone" value={noPhone} />
       </div>
 
+      {funnel && <FunnelChart funnel={funnel} />}
+
+
+
       <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <MessageCircle size={14} className="text-primary" /> Configurações do WhatsApp automático
