@@ -155,9 +155,14 @@ Deno.serve(async (req) => {
         continue;
       }
       const nome = (lead.full_name || lead.email.split("@")[0] || "amigo").split(" ")[0];
+      const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
+      const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
+      const trackedLink = `${siteUrl}/promo/${promoCode}?u=${lead.user_id}&c=${CAMPAIGN_KEY}&s=whatsapp`;
       const message = template
         .replaceAll("{nome}", nome)
-        .replaceAll("{email}", lead.email);
+        .replaceAll("{email}", lead.email)
+        .replaceAll("{link}", trackedLink);
+
 
       try {
         const providerRes =
