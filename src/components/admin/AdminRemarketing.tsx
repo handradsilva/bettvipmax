@@ -187,15 +187,39 @@ const AdminRemarketing = () => {
           <MessageCircle size={14} className="text-primary" /> Configurações do WhatsApp automático
         </h3>
 
-        <label className="flex items-center gap-2 cursor-pointer text-sm">
-          <input
-            type="checkbox"
-            checked={settings.whatsapp_enabled}
-            onChange={(e) => setSettings({ ...settings, whatsapp_enabled: e.target.checked })}
-            className="w-4 h-4 accent-primary"
-          />
-          Envio automático ativado (roda a cada 10 min via cron)
-        </label>
+        <div
+          className={`p-4 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${
+            settings.whatsapp_enabled
+              ? "bg-emerald-500/10 border-emerald-500/40"
+              : "bg-amber-500/10 border-amber-500/40"
+          }`}
+        >
+          <div className="space-y-0.5">
+            <p className="text-sm font-semibold flex items-center gap-2">
+              <span
+                className={`w-2.5 h-2.5 rounded-full ${
+                  settings.whatsapp_enabled ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                }`}
+              />
+              {settings.whatsapp_enabled ? (
+                <span className="text-emerald-500">Ativo — disparos rodando a cada 10 min</span>
+              ) : (
+                <span className="text-amber-500">Pausado — nenhum lead está recebendo</span>
+              )}
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              Pausar não apaga nada: template, ativação e leads continuam salvos. Ao retomar, o próximo cron (em até 10 min) volta a enviar.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant={settings.whatsapp_enabled ? "outline" : "default"}
+            onClick={togglePause}
+            disabled={saving}
+          >
+            {settings.whatsapp_enabled ? "⏸ Pausar disparos" : "▶ Retomar disparos"}
+          </Button>
+        </div>
 
         <div className="grid sm:grid-cols-2 gap-3">
           <div>
