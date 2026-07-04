@@ -113,6 +113,24 @@ const AdminRemarketing = () => {
       load();
     }
   };
+  const togglePause = async () => {
+    const newEnabled = !settings.whatsapp_enabled;
+    setSaving(true);
+    const { error } = await (supabase as any).rpc("admin_update_remarketing_settings", {
+      _enabled: newEnabled,
+      _template: settings.whatsapp_template,
+      _delay_hours: settings.delay_hours,
+      _provider: settings.provider,
+      _activation_date: settings.activation_date,
+    });
+    setSaving(false);
+    if (error) toast.error("Erro: " + error.message);
+    else {
+      setSettings((s) => ({ ...s, whatsapp_enabled: newEnabled }));
+      toast.success(newEnabled ? "Disparos retomados" : "Disparos pausados");
+    }
+  };
+
 
 
   const triggerNow = async () => {
