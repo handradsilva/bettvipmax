@@ -195,10 +195,17 @@ Deno.serve(async (req) => {
         .replaceAll("{email}", "teste@bettvipmax.com")
         .replaceAll("{link}", trackedLink);
       try {
+        let imageRes: any = null;
+        try { imageRes = await sendImageFirst(phone); } catch (imgErr: any) {
+          return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, error: "img: " + String(imgErr?.message ?? imgErr) }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (imageRes) await new Promise((r) => setTimeout(r, 1200));
         const providerRes = provider === "evolution"
           ? await sendEvolution(phone, message)
           : await sendZapi(phone, message);
-        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, providerRes }), {
+        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, imageUrl, imageRes, providerRes }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (e: any) {
