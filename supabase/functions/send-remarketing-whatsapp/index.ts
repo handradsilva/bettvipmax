@@ -63,9 +63,13 @@ Deno.serve(async (req) => {
 
   try {
     let manual = false;
+    let testPhone: string | null = null;
+    let testName: string | null = null;
     try {
       const body = await req.json();
       manual = !!body?.manual;
+      testPhone = body?.test_phone ?? null;
+      testName = body?.test_name ?? null;
     } catch (_) {
       // no body (cron)
     }
@@ -84,7 +88,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (!manual && !settings.whatsapp_enabled) {
+    if (!manual && !testPhone && !settings.whatsapp_enabled) {
       return new Response(
         JSON.stringify({ skipped: 0, sent: 0, failed: 0, reason: "disabled" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -96,7 +100,56 @@ Deno.serve(async (req) => {
     const provider = settings.provider as string;
     const activationDate = settings.activation_date as string | null;
 
-    // Cutoffs
+    // === TEST MODE: send to a single phone with current template ===
+    if (testPhone) {
+      const phone = normalizeBrPhone(testPhone);
+      if (!phone) {
+        return new Response(JSON.stringify({ error: "phone inválido" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
+      const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
+      let trackedLink = `${siteUrl}/promo/${promoCode}?c=${CAMPAIGN_KEY}&s=whatsapp_test`;
+      try {
+        const genCode = () => {
+          const bytes = new Uint8Array(6);
+          crypto.getRandomValues(bytes);
+          let n = 0n;
+          for (const b of bytes) n = (n << 8n) | BigInt(b);
+          return n.toString(36).slice(0, 7).padStart(7, "0");
+        };
+        for (let i = 0; i < 5; i++) {
+          const candidate = genCode();
+          const { error: insErr } = await supabase.from("short_links").insert({
+            code: candidate,
+            user_id: null,
+            campaign_key: CAMPAIGN_KEY,
+            promo_code: promoCode,
+            source: "whatsapp_test",
+          });
+          if (!insErr) { trackedLink = `${siteUrl}/r/${candidate}`; break; }
+        }
+      } catch (_) {}
+      const nome = (testName || "amigo").split(" ")[0];
+      const message = template
+        .replaceAll("{nome}", nome)
+        .replaceAll("{email}", "teste@bettvipmax.com")
+        .replaceAll("{link}", trackedLink);
+      try {
+        const providerRes = provider === "evolution"
+          ? await sendEvolution(phone, message)
+          : await sendZapi(phone, message);
+        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, providerRes }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (e: any) {
+        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, error: String(e?.message ?? e) }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const cutoffEnd = new Date(Date.now() - delayHours * 3600 * 1000).toISOString();
     // Only look 7 days back to avoid spamming old leads
     const defaultStart = new Date(Date.now() - 7 * 24 * 3600 * 1000);
