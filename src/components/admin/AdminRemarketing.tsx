@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, Send, Download, RefreshCw } from "lucide-react";
+import { MessageCircle, Send, Download, RefreshCw, ImagePlus, X } from "lucide-react";
 import { parseISO, isWithinInterval, startOfDay, endOfDay, subDays } from "date-fns";
 import AdminDateFilter from "./AdminDateFilter";
 
@@ -23,6 +23,7 @@ interface Settings {
   delay_hours: number;
   provider: string;
   activation_date: string | null;
+  whatsapp_image_url: string | null;
 }
 
 interface Funnel {
@@ -41,7 +42,10 @@ const AdminRemarketing = () => {
     delay_hours: 1,
     provider: "zapi",
     activation_date: null,
+    whatsapp_image_url: null,
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -67,7 +71,11 @@ const AdminRemarketing = () => {
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
     else setLeads((leadsRes.data as Lead[]) || []);
-    if (settingsRes.data) setSettings(settingsRes.data as Settings);
+    if (settingsRes.data) {
+      const s = settingsRes.data as Settings;
+      setSettings(s);
+      await refreshImagePreview(s.whatsapp_image_url);
+    }
     if (funnelRes.data && funnelRes.data[0]) {
       const f = funnelRes.data[0];
       setFunnel({
@@ -78,6 +86,41 @@ const AdminRemarketing = () => {
       });
     }
   };
+
+  const refreshImagePreview = async (ref: string | null) => {
+    if (!ref) { setImagePreview(null); return; }
+    if (/^https?:\/\//i.test(ref)) { setImagePreview(ref); return; }
+    const { data } = await (supabase as any).storage
+      .from("remarketing-media")
+      .createSignedUrl(ref, 60 * 60);
+    setImagePreview(data?.signedUrl ?? null);
+  };
+
+  const uploadImage = async (file: File) => {
+    if (!file.type.startsWith("image/")) { toast.error("Envie um arquivo de imagem"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Máximo 5 MB"); return; }
+    setUploadingImage(true);
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `remarketing/${Date.now()}.${ext}`;
+    const { error: upErr } = await (supabase as any).storage
+      .from("remarketing-media")
+      .upload(path, file, { upsert: false, contentType: file.type });
+    if (upErr) { setUploadingImage(false); toast.error("Upload falhou: " + upErr.message); return; }
+    setSettings((s) => ({ ...s, whatsapp_image_url: path }));
+    await refreshImagePreview(path);
+    setUploadingImage(false);
+    toast.success("Imagem carregada — clique em Salvar para aplicar");
+  };
+
+  const removeImage = async () => {
+    const ref = settings.whatsapp_image_url;
+    setSettings((s) => ({ ...s, whatsapp_image_url: null }));
+    setImagePreview(null);
+    if (ref && !/^https?:\/\//i.test(ref)) {
+      await (supabase as any).storage.from("remarketing-media").remove([ref]);
+    }
+  };
+
 
   useEffect(() => {
     load();
@@ -91,6 +134,7 @@ const AdminRemarketing = () => {
       _delay_hours: settings.delay_hours,
       _provider: settings.provider,
       _activation_date: settings.activation_date,
+      _image_url: settings.whatsapp_image_url,
     });
     setSaving(false);
     if (error) toast.error("Erro: " + error.message);
@@ -106,6 +150,7 @@ const AdminRemarketing = () => {
       _delay_hours: settings.delay_hours,
       _provider: settings.provider,
       _activation_date: now,
+      _image_url: settings.whatsapp_image_url,
     });
     if (error) toast.error("Erro: " + error.message);
     else {
@@ -122,6 +167,7 @@ const AdminRemarketing = () => {
       _delay_hours: settings.delay_hours,
       _provider: settings.provider,
       _activation_date: settings.activation_date,
+      _image_url: settings.whatsapp_image_url,
     });
     setSaving(false);
     if (error) toast.error("Erro: " + error.message);
@@ -273,6 +319,48 @@ const AdminRemarketing = () => {
             onChange={(e) => setSettings({ ...settings, whatsapp_template: e.target.value })}
           />
         </div>
+
+        <div className="p-3 rounded-lg bg-secondary/40 border border-border space-y-2">
+          <label className="text-xs text-muted-foreground block">
+            <strong className="text-foreground">Imagem do disparo (opcional)</strong> — enviada antes do texto. PNG/JPG até 5 MB.
+          </label>
+          {imagePreview ? (
+            <div className="flex items-start gap-3">
+              <img src={imagePreview} alt="Prévia" className="h-32 w-32 object-cover rounded border border-border" />
+              <div className="flex flex-col gap-2">
+                <Button size="sm" variant="outline" onClick={removeImage} disabled={uploadingImage}>
+                  <X className="w-3 h-3 mr-1" /> Remover imagem
+                </Button>
+                <label className="inline-flex">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.currentTarget.value = ""; }}
+                  />
+                  <span className="cursor-pointer text-xs px-3 py-1.5 border border-border rounded hover:bg-secondary">
+                    Trocar imagem
+                  </span>
+                </label>
+                <p className="text-[10px] text-muted-foreground">Lembre de clicar em <strong>Salvar</strong>.</p>
+              </div>
+            </div>
+          ) : (
+            <label className="inline-flex">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.currentTarget.value = ""; }}
+              />
+              <span className={`cursor-pointer inline-flex items-center gap-2 text-sm px-3 py-2 border border-border rounded hover:bg-secondary ${uploadingImage ? "opacity-50 pointer-events-none" : ""}`}>
+                <ImagePlus className="w-4 h-4" />
+                {uploadingImage ? "Enviando..." : "Adicionar imagem"}
+              </span>
+            </label>
+          )}
+        </div>
+
 
         <div className="p-3 rounded-lg bg-secondary/40 border border-border space-y-2">
           <p className="text-xs text-muted-foreground">

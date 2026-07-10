@@ -18,17 +18,24 @@ function normalizeBrPhone(input: string | null): string | null {
   return null;
 }
 
-async function sendZapi(phone: string, message: string) {
-  const instance = Deno.env.get("ZAPI_INSTANCE_ID");
-  const token = Deno.env.get("ZAPI_TOKEN");
+function zapiHeaders() {
   const clientToken = Deno.env.get("ZAPI_CLIENT_TOKEN");
-  if (!instance || !token) throw new Error("Z-API não configurada (ZAPI_INSTANCE_ID, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN)");
-  const url = `https://api.z-api.io/instances/${instance}/token/${token}/send-text`;
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (clientToken) headers["Client-Token"] = clientToken;
-  const res = await fetch(url, {
+  return headers;
+}
+
+function zapiBase() {
+  const instance = Deno.env.get("ZAPI_INSTANCE_ID");
+  const token = Deno.env.get("ZAPI_TOKEN");
+  if (!instance || !token) throw new Error("Z-API não configurada (ZAPI_INSTANCE_ID, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN)");
+  return `https://api.z-api.io/instances/${instance}/token/${token}`;
+}
+
+async function sendZapi(phone: string, message: string) {
+  const res = await fetch(`${zapiBase()}/send-text`, {
     method: "POST",
-    headers,
+    headers: zapiHeaders(),
     body: JSON.stringify({ phone, message }),
   });
   const body = await res.text();
@@ -36,14 +43,29 @@ async function sendZapi(phone: string, message: string) {
   return JSON.parse(body || "{}");
 }
 
-async function sendEvolution(phone: string, message: string) {
+async function sendZapiImage(phone: string, imageUrl: string) {
+  const res = await fetch(`${zapiBase()}/send-image`, {
+    method: "POST",
+    headers: zapiHeaders(),
+    body: JSON.stringify({ phone, image: imageUrl }),
+  });
+  const body = await res.text();
+  if (!res.ok) throw new Error(`Z-API img ${res.status}: ${body}`);
+  return JSON.parse(body || "{}");
+}
+
+function evolutionConfig() {
   const base = Deno.env.get("EVOLUTION_URL");
   const instance = Deno.env.get("EVOLUTION_INSTANCE");
   const apiKey = Deno.env.get("EVOLUTION_API_KEY");
   if (!base || !instance || !apiKey)
     throw new Error("Evolution não configurada (EVOLUTION_URL, EVOLUTION_INSTANCE, EVOLUTION_API_KEY)");
-  const url = `${base.replace(/\/$/, "")}/message/sendText/${instance}`;
-  const res = await fetch(url, {
+  return { base: base.replace(/\/$/, ""), instance, apiKey };
+}
+
+async function sendEvolution(phone: string, message: string) {
+  const { base, instance, apiKey } = evolutionConfig();
+  const res = await fetch(`${base}/message/sendText/${instance}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: apiKey },
     body: JSON.stringify({ number: phone, text: message }),
@@ -51,6 +73,33 @@ async function sendEvolution(phone: string, message: string) {
   const body = await res.text();
   if (!res.ok) throw new Error(`Evolution ${res.status}: ${body}`);
   return JSON.parse(body || "{}");
+}
+
+async function sendEvolutionImage(phone: string, imageUrl: string) {
+  const { base, instance, apiKey } = evolutionConfig();
+  const res = await fetch(`${base}/message/sendMedia/${instance}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: apiKey },
+    body: JSON.stringify({ number: phone, mediatype: "image", media: imageUrl }),
+  });
+  const body = await res.text();
+  if (!res.ok) throw new Error(`Evolution img ${res.status}: ${body}`);
+  return JSON.parse(body || "{}");
+}
+
+// Resolve a stored image reference to a public URL WhatsApp providers can fetch.
+// Accepts an absolute http(s) URL or a storage path in the "remarketing-media"
+// bucket (private). For storage paths, mint a fresh signed URL each send.
+async function resolveImageUrl(supabase: any, ref: string | null): Promise<string | null> {
+  if (!ref) return null;
+  const trimmed = ref.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  const { data, error } = await supabase.storage
+    .from("remarketing-media")
+    .createSignedUrl(trimmed, 60 * 60 * 24 * 7); // 7 days
+  if (error || !data?.signedUrl) return null;
+  return data.signedUrl;
 }
 
 Deno.serve(async (req) => {
@@ -99,6 +148,15 @@ Deno.serve(async (req) => {
     const template = settings.whatsapp_template as string;
     const provider = settings.provider as string;
     const activationDate = settings.activation_date as string | null;
+    const imageRef = (settings.whatsapp_image_url as string | null) ?? null;
+    const imageUrl = await resolveImageUrl(supabase, imageRef);
+
+    const sendImageFirst = async (phone: string) => {
+      if (!imageUrl) return null;
+      return provider === "evolution"
+        ? await sendEvolutionImage(phone, imageUrl)
+        : await sendZapiImage(phone, imageUrl);
+    };
 
     // === TEST MODE: send to a single phone with current template ===
     if (testPhone) {
@@ -137,10 +195,17 @@ Deno.serve(async (req) => {
         .replaceAll("{email}", "teste@bettvipmax.com")
         .replaceAll("{link}", trackedLink);
       try {
+        let imageRes: any = null;
+        try { imageRes = await sendImageFirst(phone); } catch (imgErr: any) {
+          return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, error: "img: " + String(imgErr?.message ?? imgErr) }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (imageRes) await new Promise((r) => setTimeout(r, 1200));
         const providerRes = provider === "evolution"
           ? await sendEvolution(phone, message)
           : await sendZapi(phone, message);
-        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, providerRes }), {
+        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, imageUrl, imageRes, providerRes }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (e: any) {
@@ -248,6 +313,13 @@ Deno.serve(async (req) => {
 
 
       try {
+        // 1) send image first (if configured), then wait a moment before the text
+        try {
+          const imgRes = await sendImageFirst(phone);
+          if (imgRes) await new Promise((r) => setTimeout(r, 1200));
+        } catch (imgErr) {
+          console.error("image send failed, continuing with text:", imgErr);
+        }
         const providerRes =
           provider === "evolution" ? await sendEvolution(phone, message) : await sendZapi(phone, message);
         await supabase.from("whatsapp_campaigns").insert({

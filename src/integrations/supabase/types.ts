@@ -166,6 +166,7 @@ export type Database = {
           provider: string
           updated_at: string
           whatsapp_enabled: boolean
+          whatsapp_image_url: string | null
           whatsapp_template: string
         }
         Insert: {
@@ -175,6 +176,7 @@ export type Database = {
           provider?: string
           updated_at?: string
           whatsapp_enabled?: boolean
+          whatsapp_image_url?: string | null
           whatsapp_template?: string
         }
         Update: {
@@ -184,6 +186,7 @@ export type Database = {
           provider?: string
           updated_at?: string
           whatsapp_enabled?: boolean
+          whatsapp_image_url?: string | null
           whatsapp_template?: string
         }
         Relationships: []
@@ -442,6 +445,17 @@ export type Database = {
               _activation_date?: string
               _delay_hours: number
               _enabled: boolean
+              _provider: string
+              _template: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _activation_date: string
+              _delay_hours: number
+              _enabled: boolean
+              _image_url?: string
               _provider: string
               _template: string
             }
