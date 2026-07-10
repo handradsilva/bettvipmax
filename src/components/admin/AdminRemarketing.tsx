@@ -23,6 +23,7 @@ interface Settings {
   delay_hours: number;
   provider: string;
   activation_date: string | null;
+  whatsapp_image_url: string | null;
 }
 
 interface Funnel {
@@ -41,7 +42,10 @@ const AdminRemarketing = () => {
     delay_hours: 1,
     provider: "zapi",
     activation_date: null,
+    whatsapp_image_url: null,
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
