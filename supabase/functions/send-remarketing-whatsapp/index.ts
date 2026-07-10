@@ -313,6 +313,13 @@ Deno.serve(async (req) => {
 
 
       try {
+        // 1) send image first (if configured), then wait a moment before the text
+        try {
+          const imgRes = await sendImageFirst(phone);
+          if (imgRes) await new Promise((r) => setTimeout(r, 1200));
+        } catch (imgErr) {
+          console.error("image send failed, continuing with text:", imgErr);
+        }
         const providerRes =
           provider === "evolution" ? await sendEvolution(phone, message) : await sendZapi(phone, message);
         await supabase.from("whatsapp_campaigns").insert({
