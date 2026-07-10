@@ -321,6 +321,48 @@ const AdminRemarketing = () => {
         </div>
 
         <div className="p-3 rounded-lg bg-secondary/40 border border-border space-y-2">
+          <label className="text-xs text-muted-foreground block">
+            <strong className="text-foreground">Imagem do disparo (opcional)</strong> — enviada antes do texto. PNG/JPG até 5 MB.
+          </label>
+          {imagePreview ? (
+            <div className="flex items-start gap-3">
+              <img src={imagePreview} alt="Prévia" className="h-32 w-32 object-cover rounded border border-border" />
+              <div className="flex flex-col gap-2">
+                <Button size="sm" variant="outline" onClick={removeImage} disabled={uploadingImage}>
+                  <X className="w-3 h-3 mr-1" /> Remover imagem
+                </Button>
+                <label className="inline-flex">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.currentTarget.value = ""; }}
+                  />
+                  <span className="cursor-pointer text-xs px-3 py-1.5 border border-border rounded hover:bg-secondary">
+                    Trocar imagem
+                  </span>
+                </label>
+                <p className="text-[10px] text-muted-foreground">Lembre de clicar em <strong>Salvar</strong>.</p>
+              </div>
+            </div>
+          ) : (
+            <label className="inline-flex">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.currentTarget.value = ""; }}
+              />
+              <span className={`cursor-pointer inline-flex items-center gap-2 text-sm px-3 py-2 border border-border rounded hover:bg-secondary ${uploadingImage ? "opacity-50 pointer-events-none" : ""}`}>
+                <ImagePlus className="w-4 h-4" />
+                {uploadingImage ? "Enviando..." : "Adicionar imagem"}
+              </span>
+            </label>
+          )}
+        </div>
+
+
+        <div className="p-3 rounded-lg bg-secondary/40 border border-border space-y-2">
           <p className="text-xs text-muted-foreground">
             <strong className="text-foreground">Data de ativação:</strong>{" "}
             {settings.activation_date
