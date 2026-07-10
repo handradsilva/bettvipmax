@@ -157,7 +157,37 @@ Deno.serve(async (req) => {
       const nome = (lead.full_name || lead.email.split("@")[0] || "amigo").split(" ")[0];
       const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
       const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
-      const trackedLink = `${siteUrl}/promo/${promoCode}?u=${lead.user_id}&c=${CAMPAIGN_KEY}&s=whatsapp`;
+
+      // Generate a short tracking link (e.g. https://site/r/aB3xY9) instead of
+      // the long /promo/CODE?u=..&c=..&s=.. URL. /r/:code resolves to the same
+      // flow in ShortLink.tsx, preserving click + deposit attribution.
+      let trackedLink = `${siteUrl}/promo/${promoCode}?u=${lead.user_id}&c=${CAMPAIGN_KEY}&s=whatsapp`;
+      try {
+        // 7-char base36 code (~78 billion combos) — collision retry a few times
+        const genCode = () => {
+          const bytes = new Uint8Array(6);
+          crypto.getRandomValues(bytes);
+          let n = 0n;
+          for (const b of bytes) n = (n << 8n) | BigInt(b);
+          return n.toString(36).slice(0, 7).padStart(7, "0");
+        };
+        let shortCode: string | null = null;
+        for (let i = 0; i < 5; i++) {
+          const candidate = genCode();
+          const { error: insErr } = await supabase.from("short_links").insert({
+            code: candidate,
+            user_id: lead.user_id,
+            campaign_key: CAMPAIGN_KEY,
+            promo_code: promoCode,
+            source: "whatsapp",
+          });
+          if (!insErr) { shortCode = candidate; break; }
+        }
+        if (shortCode) trackedLink = `${siteUrl}/r/${shortCode}`;
+      } catch (_) {
+        // fallback to long link
+      }
+
       const message = template
         .replaceAll("{nome}", nome)
         .replaceAll("{email}", lead.email)
