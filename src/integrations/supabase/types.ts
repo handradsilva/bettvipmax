@@ -188,6 +188,33 @@ export type Database = {
         }
         Relationships: []
       }
+      short_links: {
+        Row: {
+          campaign_key: string
+          code: string
+          created_at: string
+          promo_code: string
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign_key: string
+          code: string
+          created_at?: string
+          promo_code: string
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign_key?: string
+          code?: string
+          created_at?: string
+          promo_code?: string
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
