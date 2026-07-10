@@ -17,6 +17,7 @@ import Sports from "./pages/Sports";
 import Admin from "./pages/Admin";
 import GameDetail from "./pages/GameDetail";
 import Promo from "./pages/Promo";
+import ShortLink from "./pages/ShortLink";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => {
               <Route path="/sports" element={<Sports />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/promo/:codigo" element={<Promo />} />
+              <Route path="/r/:code" element={<ShortLink />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
