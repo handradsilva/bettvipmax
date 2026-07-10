@@ -148,6 +148,15 @@ Deno.serve(async (req) => {
     const template = settings.whatsapp_template as string;
     const provider = settings.provider as string;
     const activationDate = settings.activation_date as string | null;
+    const imageRef = (settings.whatsapp_image_url as string | null) ?? null;
+    const imageUrl = await resolveImageUrl(supabase, imageRef);
+
+    const sendImageFirst = async (phone: string) => {
+      if (!imageUrl) return null;
+      return provider === "evolution"
+        ? await sendEvolutionImage(phone, imageUrl)
+        : await sendZapiImage(phone, imageUrl);
+    };
 
     // === TEST MODE: send to a single phone with current template ===
     if (testPhone) {
