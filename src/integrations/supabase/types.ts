@@ -452,7 +452,7 @@ export type Database = {
           }
         | {
             Args: {
-              _activation_date?: string
+              _activation_date: string
               _delay_hours: number
               _enabled: boolean
               _image_url?: string
