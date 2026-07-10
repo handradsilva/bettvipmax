@@ -150,6 +150,7 @@ const AdminRemarketing = () => {
       _delay_hours: settings.delay_hours,
       _provider: settings.provider,
       _activation_date: now,
+      _image_url: settings.whatsapp_image_url,
     });
     if (error) toast.error("Erro: " + error.message);
     else {
