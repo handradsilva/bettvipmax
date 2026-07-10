@@ -71,7 +71,11 @@ const AdminRemarketing = () => {
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
     else setLeads((leadsRes.data as Lead[]) || []);
-    if (settingsRes.data) setSettings(settingsRes.data as Settings);
+    if (settingsRes.data) {
+      const s = settingsRes.data as Settings;
+      setSettings(s);
+      await refreshImagePreview(s.whatsapp_image_url);
+    }
     if (funnelRes.data && funnelRes.data[0]) {
       const f = funnelRes.data[0];
       setFunnel({
@@ -82,6 +86,41 @@ const AdminRemarketing = () => {
       });
     }
   };
+
+  const refreshImagePreview = async (ref: string | null) => {
+    if (!ref) { setImagePreview(null); return; }
+    if (/^https?:\/\//i.test(ref)) { setImagePreview(ref); return; }
+    const { data } = await (supabase as any).storage
+      .from("remarketing-media")
+      .createSignedUrl(ref, 60 * 60);
+    setImagePreview(data?.signedUrl ?? null);
+  };
+
+  const uploadImage = async (file: File) => {
+    if (!file.type.startsWith("image/")) { toast.error("Envie um arquivo de imagem"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Máximo 5 MB"); return; }
+    setUploadingImage(true);
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `remarketing/${Date.now()}.${ext}`;
+    const { error: upErr } = await (supabase as any).storage
+      .from("remarketing-media")
+      .upload(path, file, { upsert: false, contentType: file.type });
+    if (upErr) { setUploadingImage(false); toast.error("Upload falhou: " + upErr.message); return; }
+    setSettings((s) => ({ ...s, whatsapp_image_url: path }));
+    await refreshImagePreview(path);
+    setUploadingImage(false);
+    toast.success("Imagem carregada — clique em Salvar para aplicar");
+  };
+
+  const removeImage = async () => {
+    const ref = settings.whatsapp_image_url;
+    setSettings((s) => ({ ...s, whatsapp_image_url: null }));
+    setImagePreview(null);
+    if (ref && !/^https?:\/\//i.test(ref)) {
+      await (supabase as any).storage.from("remarketing-media").remove([ref]);
+    }
+  };
+
 
   useEffect(() => {
     load();
