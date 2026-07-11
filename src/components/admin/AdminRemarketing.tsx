@@ -84,7 +84,11 @@ const AdminRemarketing = () => {
     ]);
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
-    else setLeads((leadsRes.data as Lead[]) || []);
+    else {
+      const leadsData = (leadsRes.data as Lead[]) || [];
+      setLeads(leadsData);
+      await loadShortLinks(leadsData.map((l) => l.user_id));
+    }
     if (settingsRes.data) {
       const s = settingsRes.data as Settings;
       setSettings(s);
@@ -99,6 +103,65 @@ const AdminRemarketing = () => {
         clicked_and_deposited: Number(f.clicked_and_deposited) || 0,
       });
     }
+  };
+
+  const loadShortLinks = async (userIds: string[]) => {
+    if (userIds.length === 0) return;
+    const map: Record<string, string> = {};
+    // Query in chunks to avoid URL length limits
+    const chunkSize = 200;
+    for (let i = 0; i < userIds.length; i += chunkSize) {
+      const chunk = userIds.slice(i, i + chunkSize);
+      const { data } = await (supabase as any)
+        .from("short_links")
+        .select("code, user_id, created_at")
+        .eq("campaign_key", CAMPAIGN_KEY)
+        .in("user_id", chunk)
+        .order("created_at", { ascending: false });
+      for (const row of data ?? []) {
+        // keep the most recent (first because desc)
+        if (!map[row.user_id]) map[row.user_id] = `${SITE_URL}/r/${row.code}`;
+      }
+    }
+    setShortLinks(map);
+  };
+
+  const ensureLinkForLead = async (lead: Lead): Promise<string | null> => {
+    if (shortLinks[lead.user_id]) return shortLinks[lead.user_id];
+    for (let i = 0; i < 5; i++) {
+      const code = genCode();
+      const { error } = await (supabase as any).from("short_links").insert({
+        code,
+        user_id: lead.user_id,
+        campaign_key: CAMPAIGN_KEY,
+        promo_code: PROMO_CODE,
+        source: "whatsapp",
+      });
+      if (!error) {
+        const url = `${SITE_URL}/r/${code}`;
+        setShortLinks((m) => ({ ...m, [lead.user_id]: url }));
+        return url;
+      }
+    }
+    return null;
+  };
+
+  const generateAllMissing = async () => {
+    setGeneratingLinks(true);
+    try {
+      const missing = filteredLeads.filter((l) => !shortLinks[l.user_id]);
+      for (const l of missing) await ensureLinkForLead(l);
+      toast.success(`${missing.length} link(s) gerado(s)`);
+    } finally {
+      setGeneratingLinks(false);
+    }
+  };
+
+  const copyLink = async (lead: Lead) => {
+    const url = await ensureLinkForLead(lead);
+    if (!url) { toast.error("Falha ao gerar link"); return; }
+    await navigator.clipboard.writeText(url);
+    toast.success("Link copiado");
   };
 
   const refreshImagePreview = async (ref: string | null) => {
