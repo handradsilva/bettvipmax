@@ -33,8 +33,21 @@ interface Funnel {
   clicked_and_deposited: number;
 }
 
+const CAMPAIGN_KEY = "sem_deposito_1h";
+const SITE_URL = "https://www.bettvipmax.com";
+const PROMO_CODE = "VOLTA200";
+
+const genCode = () => {
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  let n = 0n;
+  for (const b of bytes) n = (n << 8n) | BigInt(b);
+  return n.toString(36).slice(0, 7).padStart(7, "0");
+};
+
 const AdminRemarketing = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [shortLinks, setShortLinks] = useState<Record<string, string>>({});
   const [funnel, setFunnel] = useState<Funnel | null>(null);
   const [settings, setSettings] = useState<Settings>({
     whatsapp_enabled: false,
@@ -50,6 +63,7 @@ const AdminRemarketing = () => {
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [generatingLinks, setGeneratingLinks] = useState(false);
   const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState<Date>(new Date());
 
