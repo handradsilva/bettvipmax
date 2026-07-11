@@ -54,6 +54,18 @@ async function sendZapiImage(phone: string, imageUrl: string) {
   return JSON.parse(body || "{}");
 }
 
+async function resolveZapiWhatsappPhone(phone: string): Promise<string> {
+  const res = await fetch(`${zapiBase()}/phone-exists/${phone}`, {
+    method: "GET",
+    headers: zapiHeaders(),
+  });
+  const body = await res.text();
+  if (!res.ok) throw new Error(`Z-API phone-exists ${res.status}: ${body}`);
+  const data = JSON.parse(body || "{}");
+  if (data?.exists === false) throw new Error(`Número sem WhatsApp confirmado pela Z-API: ${phone}`);
+  return String(data?.phone || phone).replace(/\D/g, "") || phone;
+}
+
 function evolutionConfig() {
   const base = Deno.env.get("EVOLUTION_URL");
   const instance = Deno.env.get("EVOLUTION_INSTANCE");
@@ -166,6 +178,8 @@ Deno.serve(async (req) => {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      let zapiPhone = phone;
+      if (provider !== "evolution") zapiPhone = await resolveZapiWhatsappPhone(phone);
       const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
       const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
       let trackedLink = `${siteUrl}/promo/${promoCode}?c=${CAMPAIGN_KEY}&s=whatsapp_test`;
@@ -196,16 +210,16 @@ Deno.serve(async (req) => {
         .replaceAll("{link}", trackedLink);
       try {
         let imageRes: any = null;
-        try { imageRes = await sendImageFirst(phone); } catch (imgErr: any) {
-          return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, error: "img: " + String(imgErr?.message ?? imgErr) }), {
+        try { imageRes = await sendImageFirst(zapiPhone); } catch (imgErr: any) {
+          return new Response(JSON.stringify({ test: true, phone: zapiPhone, originalPhone: phone, message, link: trackedLink, error: "img: " + String(imgErr?.message ?? imgErr) }), {
             status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
         if (imageRes) await new Promise((r) => setTimeout(r, 1200));
         const providerRes = provider === "evolution"
           ? await sendEvolution(phone, message)
-          : await sendZapi(phone, message);
-        return new Response(JSON.stringify({ test: true, phone, message, link: trackedLink, imageUrl, imageRes, providerRes }), {
+          : await sendZapi(zapiPhone, message);
+        return new Response(JSON.stringify({ test: true, phone: zapiPhone, originalPhone: phone, message, link: trackedLink, imageUrl, imageRes, providerRes }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (e: any) {
@@ -272,6 +286,7 @@ Deno.serve(async (req) => {
         skipped++;
         continue;
       }
+      let sendPhone = phone;
       const nome = (lead.full_name || lead.email.split("@")[0] || "amigo").split(" ")[0];
       const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
       const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
@@ -313,20 +328,21 @@ Deno.serve(async (req) => {
 
 
       try {
+        if (provider !== "evolution") sendPhone = await resolveZapiWhatsappPhone(phone);
         // 1) send image first (if configured), then wait a moment before the text
         try {
-          const imgRes = await sendImageFirst(phone);
+          const imgRes = await sendImageFirst(sendPhone);
           if (imgRes) await new Promise((r) => setTimeout(r, 1200));
         } catch (imgErr) {
           console.error("image send failed, continuing with text:", imgErr);
         }
         const providerRes =
-          provider === "evolution" ? await sendEvolution(phone, message) : await sendZapi(phone, message);
+          provider === "evolution" ? await sendEvolution(sendPhone, message) : await sendZapi(sendPhone, message);
         await supabase.from("whatsapp_campaigns").insert({
           user_id: lead.user_id,
           campaign_key: CAMPAIGN_KEY,
           status: "sent",
-          phone,
+          phone: sendPhone,
           message,
           provider_response: providerRes,
         });
@@ -339,7 +355,7 @@ Deno.serve(async (req) => {
           user_id: lead.user_id,
           campaign_key: CAMPAIGN_KEY,
           status: "failed",
-          phone,
+          phone: sendPhone,
           message,
           error: String(e?.message ?? e),
         });
