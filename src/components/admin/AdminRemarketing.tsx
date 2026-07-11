@@ -112,6 +112,16 @@ const AdminRemarketing = () => {
         clicked_and_deposited: Number(f.clicked_and_deposited) || 0,
       });
     }
+    if (Array.isArray(convRes?.data)) {
+      setConversions(
+        (convRes.data as any[]).map((r) => ({
+          user_id: r.user_id,
+          email: r.email,
+          amount: Number(r.amount) || 0,
+          deposited_at: r.deposited_at,
+        }))
+      );
+    }
   };
 
   const loadShortLinks = async (userIds: string[]) => {
