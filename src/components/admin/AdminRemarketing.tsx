@@ -33,6 +33,13 @@ interface Funnel {
   clicked_and_deposited: number;
 }
 
+interface Conversion {
+  user_id: string;
+  email: string;
+  amount: number;
+  deposited_at: string;
+}
+
 const CAMPAIGN_KEY = "sem_deposito_1h";
 const SITE_URL = "https://www.bettvipmax.com";
 const PROMO_CODE = "VOLTA200";
