@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminData } from "@/hooks/useAdminData";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { LayoutDashboard, Users, Wallet, UserCheck, Settings, DollarSign, MessageCircle, Tag } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, UserCheck, Settings, DollarSign } from "lucide-react";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminDeposits from "@/components/admin/AdminDeposits";
