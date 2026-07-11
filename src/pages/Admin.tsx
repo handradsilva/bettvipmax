@@ -10,8 +10,6 @@ import AdminDeposits from "@/components/admin/AdminDeposits";
 import AdminAffiliates from "@/components/admin/AdminAffiliates";
 import AdminBalance from "@/components/admin/AdminBalance";
 import AdminSettings from "@/components/admin/AdminSettings";
-import AdminRemarketing from "@/components/admin/AdminRemarketing";
-import AdminPromoCodes from "@/components/admin/AdminPromoCodes";
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -82,12 +80,6 @@ const Admin = () => {
 
           <TabsContent value="dashboard">
             <AdminDashboard profiles={profiles} transactions={transactions} referrals={referrals} refetch={refetch} />
-          </TabsContent>
-          <TabsContent value="remarketing">
-            <AdminRemarketing />
-          </TabsContent>
-          <TabsContent value="promos">
-            <AdminPromoCodes />
           </TabsContent>
           <TabsContent value="affiliates">
             <AdminAffiliates profiles={profiles} referrals={referrals} transactions={transactions} toggleAffiliate={toggleAffiliate} />
