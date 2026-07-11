@@ -636,7 +636,7 @@ const AdminRemarketing = () => {
   );
 };
 
-const MetricCard = ({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) => (
+const MetricCard = ({ label, value, highlight }: { label: string; value: number | string; highlight?: boolean }) => (
   <div
     className={`p-4 rounded-2xl border ${
       highlight ? "bg-primary/10 border-primary/40" : "bg-card border-border"
