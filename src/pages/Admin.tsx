@@ -44,8 +44,6 @@ const Admin = () => {
 
   const tabs = [
     { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { value: "remarketing", label: "Remarketing", icon: MessageCircle },
-    { value: "promos", label: "Códigos", icon: Tag },
     { value: "affiliates", label: "Afiliados", icon: UserCheck },
     { value: "users", label: "Usuários", icon: Users },
     { value: "deposits", label: "Depósitos", icon: Wallet },
