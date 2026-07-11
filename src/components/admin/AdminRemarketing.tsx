@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, Send, Download, RefreshCw, ImagePlus, X } from "lucide-react";
+import { MessageCircle, Send, Download, RefreshCw, ImagePlus, X, Copy } from "lucide-react";
 import { parseISO, isWithinInterval, startOfDay, endOfDay, subDays } from "date-fns";
 import AdminDateFilter from "./AdminDateFilter";
 
@@ -33,8 +33,21 @@ interface Funnel {
   clicked_and_deposited: number;
 }
 
+const CAMPAIGN_KEY = "sem_deposito_1h";
+const SITE_URL = "https://www.bettvipmax.com";
+const PROMO_CODE = "VOLTA200";
+
+const genCode = () => {
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  let n = 0n;
+  for (const b of bytes) n = (n << 8n) | BigInt(b);
+  return n.toString(36).slice(0, 7).padStart(7, "0");
+};
+
 const AdminRemarketing = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [shortLinks, setShortLinks] = useState<Record<string, string>>({});
   const [funnel, setFunnel] = useState<Funnel | null>(null);
   const [settings, setSettings] = useState<Settings>({
     whatsapp_enabled: false,
@@ -50,6 +63,7 @@ const AdminRemarketing = () => {
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [generatingLinks, setGeneratingLinks] = useState(false);
   const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState<Date>(new Date());
 
@@ -70,7 +84,11 @@ const AdminRemarketing = () => {
     ]);
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
-    else setLeads((leadsRes.data as Lead[]) || []);
+    else {
+      const leadsData = (leadsRes.data as Lead[]) || [];
+      setLeads(leadsData);
+      await loadShortLinks(leadsData.map((l) => l.user_id));
+    }
     if (settingsRes.data) {
       const s = settingsRes.data as Settings;
       setSettings(s);
@@ -85,6 +103,65 @@ const AdminRemarketing = () => {
         clicked_and_deposited: Number(f.clicked_and_deposited) || 0,
       });
     }
+  };
+
+  const loadShortLinks = async (userIds: string[]) => {
+    if (userIds.length === 0) return;
+    const map: Record<string, string> = {};
+    // Query in chunks to avoid URL length limits
+    const chunkSize = 200;
+    for (let i = 0; i < userIds.length; i += chunkSize) {
+      const chunk = userIds.slice(i, i + chunkSize);
+      const { data } = await (supabase as any)
+        .from("short_links")
+        .select("code, user_id, created_at")
+        .eq("campaign_key", CAMPAIGN_KEY)
+        .in("user_id", chunk)
+        .order("created_at", { ascending: false });
+      for (const row of data ?? []) {
+        // keep the most recent (first because desc)
+        if (!map[row.user_id]) map[row.user_id] = `${SITE_URL}/r/${row.code}`;
+      }
+    }
+    setShortLinks(map);
+  };
+
+  const ensureLinkForLead = async (lead: Lead): Promise<string | null> => {
+    if (shortLinks[lead.user_id]) return shortLinks[lead.user_id];
+    for (let i = 0; i < 5; i++) {
+      const code = genCode();
+      const { error } = await (supabase as any).from("short_links").insert({
+        code,
+        user_id: lead.user_id,
+        campaign_key: CAMPAIGN_KEY,
+        promo_code: PROMO_CODE,
+        source: "whatsapp",
+      });
+      if (!error) {
+        const url = `${SITE_URL}/r/${code}`;
+        setShortLinks((m) => ({ ...m, [lead.user_id]: url }));
+        return url;
+      }
+    }
+    return null;
+  };
+
+  const generateAllMissing = async () => {
+    setGeneratingLinks(true);
+    try {
+      const missing = filteredLeads.filter((l) => !shortLinks[l.user_id]);
+      for (const l of missing) await ensureLinkForLead(l);
+      toast.success(`${missing.length} link(s) gerado(s)`);
+    } finally {
+      setGeneratingLinks(false);
+    }
+  };
+
+  const copyLink = async (lead: Lead) => {
+    const url = await ensureLinkForLead(lead);
+    if (!url) { toast.error("Falha ao gerar link"); return; }
+    await navigator.clipboard.writeText(url);
+    toast.success("Link copiado");
   };
 
   const refreshImagePreview = async (ref: string | null) => {
@@ -197,15 +274,24 @@ const AdminRemarketing = () => {
     }
   };
 
-  const exportCsv = () => {
+  const exportCsv = async () => {
+    // Ensure every filtered lead has a bonus link before exporting.
+    setGeneratingLinks(true);
+    const linkMap: Record<string, string> = { ...shortLinks };
+    for (const l of filteredLeads) {
+      if (!linkMap[l.user_id]) {
+        const url = await ensureLinkForLead(l);
+        if (url) linkMap[l.user_id] = url;
+      }
+    }
+    setGeneratingLinks(false);
+
     const rows = [
-      ["email", "nome", "telefone", "cadastro", "ja_enviado"],
+      ["nome", "telefone", "link_especial_bonus"],
       ...filteredLeads.map((l) => [
-        l.email,
         l.full_name || "",
         l.phone || "",
-        l.created_at,
-        l.already_messaged ? "sim" : "nao",
+        linkMap[l.user_id] || "",
       ]),
     ];
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -397,8 +483,18 @@ const AdminRemarketing = () => {
       </div>
 
       <div className="rounded-xl border border-border overflow-hidden">
-        <div className="p-3 bg-secondary text-xs text-muted-foreground">
-          Leads elegíveis (cadastrados há mais de 1h e sem depósito confirmado)
+        <div className="p-3 bg-secondary flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-muted-foreground">
+            Leads elegíveis (cadastrados há mais de 1h e sem depósito confirmado)
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={generateAllMissing} size="sm" variant="outline" disabled={generatingLinks} className="gap-2 h-7 text-xs">
+              {generatingLinks ? "Gerando..." : "Gerar links faltantes"}
+            </Button>
+            <Button onClick={exportCsv} size="sm" variant="default" disabled={generatingLinks} className="gap-2 h-7 text-xs">
+              <Download size={12} /> Exportar (nome, telefone, link)
+            </Button>
+          </div>
         </div>
         <div className="overflow-x-auto max-h-[500px]">
           <table className="w-full text-xs">
@@ -409,31 +505,64 @@ const AdminRemarketing = () => {
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">Telefone</th>
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">Cadastro</th>
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">Status</th>
+                <th className="text-left px-3 py-2 text-muted-foreground font-medium">Link especial bônus</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredLeads.slice(0, 200).map((l) => (
-                <tr key={l.user_id} className="hover:bg-secondary/30">
-                  <td className="px-3 py-2 text-foreground">{l.email}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{l.full_name || "—"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{l.phone || "❌ sem"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">
-                    {new Date(l.created_at).toLocaleString("pt-BR")}
-                  </td>
-                  <td className="px-3 py-2">
-                    {l.already_messaged ? (
-                      <span className="text-emerald-500">✓ enviado</span>
-                    ) : l.phone ? (
-                      <span className="text-primary">pronto</span>
-                    ) : (
-                      <span className="text-destructive">sem telefone</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {filteredLeads.slice(0, 200).map((l) => {
+                const link = shortLinks[l.user_id];
+                return (
+                  <tr key={l.user_id} className="hover:bg-secondary/30">
+                    <td className="px-3 py-2 text-foreground">{l.email}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{l.full_name || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{l.phone || "❌ sem"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {new Date(l.created_at).toLocaleString("pt-BR")}
+                    </td>
+                    <td className="px-3 py-2">
+                      {l.already_messaged ? (
+                        <span className="text-emerald-500">✓ enviado</span>
+                      ) : l.phone ? (
+                        <span className="text-primary">pronto</span>
+                      ) : (
+                        <span className="text-destructive">sem telefone</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      {link ? (
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary underline underline-offset-2 truncate max-w-[220px] inline-block"
+                            title={link}
+                          >
+                            {link.replace(/^https?:\/\//, "")}
+                          </a>
+                          <button
+                            onClick={() => copyLink(l)}
+                            className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground"
+                            title="Copiar link"
+                          >
+                            <Copy size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => ensureLinkForLead(l)}
+                          className="text-[11px] px-2 py-1 rounded border border-border hover:bg-secondary text-muted-foreground"
+                        >
+                          Gerar link
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
               {filteredLeads.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     Nenhum lead no período selecionado
                   </td>
                 </tr>
