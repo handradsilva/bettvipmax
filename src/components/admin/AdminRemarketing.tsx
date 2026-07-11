@@ -274,15 +274,24 @@ const AdminRemarketing = () => {
     }
   };
 
-  const exportCsv = () => {
+  const exportCsv = async () => {
+    // Ensure every filtered lead has a bonus link before exporting.
+    setGeneratingLinks(true);
+    const linkMap: Record<string, string> = { ...shortLinks };
+    for (const l of filteredLeads) {
+      if (!linkMap[l.user_id]) {
+        const url = await ensureLinkForLead(l);
+        if (url) linkMap[l.user_id] = url;
+      }
+    }
+    setGeneratingLinks(false);
+
     const rows = [
-      ["email", "nome", "telefone", "cadastro", "ja_enviado"],
+      ["nome", "telefone", "link_especial_bonus"],
       ...filteredLeads.map((l) => [
-        l.email,
         l.full_name || "",
         l.phone || "",
-        l.created_at,
-        l.already_messaged ? "sim" : "nao",
+        linkMap[l.user_id] || "",
       ]),
     ];
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
