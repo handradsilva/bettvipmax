@@ -353,21 +353,22 @@ const AdminRemarketing = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
         <MetricCard
           label="Total depositado via link 💰"
-          value={`R$ ${conversions.reduce((s, c) => s + c.amount, 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          value={`R$ ${filteredConversions.reduce((s, c) => s + c.amount, 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           highlight
         />
-        <MetricCard label="Depósitos pelo link" value={conversions.length} />
+        <MetricCard label="Depósitos pelo link" value={filteredConversions.length} />
+        <MetricCard label="Recuperados 🎯" value={recoveredCount} />
       </div>
 
-      {conversions.length > 0 && (
+      {filteredConversions.length > 0 && (
         <div className="rounded-xl border border-border overflow-hidden">
           <div className="p-3 bg-secondary">
             <span className="text-xs text-muted-foreground">
-              💸 Depósitos vindos do link rastreado ({conversions.length})
+              💸 Depósitos vindos do link rastreado ({filteredConversions.length}) — {recoveredCount} lead(s) recuperado(s)
             </span>
           </div>
           <div className="overflow-x-auto max-h-[300px]">
@@ -380,7 +381,7 @@ const AdminRemarketing = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {conversions.map((c, i) => (
+                {filteredConversions.map((c, i) => (
                   <tr key={`${c.user_id}-${i}`} className="hover:bg-secondary/30">
                     <td className="px-3 py-2 text-foreground">{c.email}</td>
                     <td className="px-3 py-2 text-right text-emerald-500 font-semibold">
