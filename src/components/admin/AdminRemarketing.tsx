@@ -83,6 +83,19 @@ const AdminRemarketing = () => {
     );
   }, [leads, startDate, endDate]);
 
+  const filteredConversions = useMemo(() => {
+    const s = startOfDay(startDate);
+    const e = endOfDay(endDate);
+    return conversions.filter((c) =>
+      isWithinInterval(parseISO(c.deposited_at), { start: s, end: e })
+    );
+  }, [conversions, startDate, endDate]);
+
+  const recoveredCount = useMemo(
+    () => new Set(filteredConversions.map((c) => c.user_id)).size,
+    [filteredConversions]
+  );
+
   const load = async () => {
     setLoading(true);
     const [leadsRes, settingsRes, funnelRes, convRes] = await Promise.all([
