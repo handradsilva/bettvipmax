@@ -56,6 +56,7 @@ const AdminRemarketing = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [shortLinks, setShortLinks] = useState<Record<string, string>>({});
   const [funnel, setFunnel] = useState<Funnel | null>(null);
+  const [conversions, setConversions] = useState<Conversion[]>([]);
   const [settings, setSettings] = useState<Settings>({
     whatsapp_enabled: false,
     whatsapp_template: "",
