@@ -340,12 +340,49 @@ const AdminRemarketing = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
-        <MetricCard label="Prontos para envio" value={eligible.length} highlight />
-        
-        <MetricCard label="Sem telefone" value={noPhone} />
+        <MetricCard
+          label="Total depositado via link 💰"
+          value={`R$ ${conversions.reduce((s, c) => s + c.amount, 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          highlight
+        />
+        <MetricCard label="Depósitos pelo link" value={conversions.length} />
       </div>
+
+      {conversions.length > 0 && (
+        <div className="rounded-xl border border-border overflow-hidden">
+          <div className="p-3 bg-secondary">
+            <span className="text-xs text-muted-foreground">
+              💸 Depósitos vindos do link rastreado ({conversions.length})
+            </span>
+          </div>
+          <div className="overflow-x-auto max-h-[300px]">
+            <table className="w-full text-xs">
+              <thead className="bg-secondary sticky top-0">
+                <tr>
+                  <th className="text-left px-3 py-2 text-muted-foreground font-medium">Email</th>
+                  <th className="text-right px-3 py-2 text-muted-foreground font-medium">Valor</th>
+                  <th className="text-left px-3 py-2 text-muted-foreground font-medium">Data</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {conversions.map((c, i) => (
+                  <tr key={`${c.user_id}-${i}`} className="hover:bg-secondary/30">
+                    <td className="px-3 py-2 text-foreground">{c.email}</td>
+                    <td className="px-3 py-2 text-right text-emerald-500 font-semibold">
+                      R$ {c.amount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {new Date(c.deposited_at).toLocaleString("pt-BR")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {funnel && <FunnelChart funnel={funnel} />}
 
