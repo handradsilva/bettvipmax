@@ -85,10 +85,11 @@ const AdminRemarketing = () => {
 
   const load = async () => {
     setLoading(true);
-    const [leadsRes, settingsRes, funnelRes] = await Promise.all([
+    const [leadsRes, settingsRes, funnelRes, convRes] = await Promise.all([
       (supabase as any).rpc("admin_get_leads_without_deposit", { _min_hours: 1 }),
       (supabase as any).from("remarketing_settings").select("*").eq("id", 1).maybeSingle(),
       (supabase as any).rpc("admin_get_remarketing_funnel"),
+      (supabase as any).rpc("admin_get_remarketing_conversions"),
     ]);
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
