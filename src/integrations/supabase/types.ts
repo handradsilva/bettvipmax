@@ -413,6 +413,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_get_remarketing_conversions: {
+        Args: never
+        Returns: {
+          amount: number
+          deposited_at: string
+          email: string
+          user_id: string
+        }[]
+      }
       admin_get_remarketing_funnel: {
         Args: never
         Returns: {

@@ -33,6 +33,13 @@ interface Funnel {
   clicked_and_deposited: number;
 }
 
+interface Conversion {
+  user_id: string;
+  email: string;
+  amount: number;
+  deposited_at: string;
+}
+
 const CAMPAIGN_KEY = "sem_deposito_1h";
 const SITE_URL = "https://www.bettvipmax.com";
 const PROMO_CODE = "VOLTA200";
@@ -49,6 +56,7 @@ const AdminRemarketing = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [shortLinks, setShortLinks] = useState<Record<string, string>>({});
   const [funnel, setFunnel] = useState<Funnel | null>(null);
+  const [conversions, setConversions] = useState<Conversion[]>([]);
   const [settings, setSettings] = useState<Settings>({
     whatsapp_enabled: false,
     whatsapp_template: "",
@@ -77,10 +85,11 @@ const AdminRemarketing = () => {
 
   const load = async () => {
     setLoading(true);
-    const [leadsRes, settingsRes, funnelRes] = await Promise.all([
+    const [leadsRes, settingsRes, funnelRes, convRes] = await Promise.all([
       (supabase as any).rpc("admin_get_leads_without_deposit", { _min_hours: 1 }),
       (supabase as any).from("remarketing_settings").select("*").eq("id", 1).maybeSingle(),
       (supabase as any).rpc("admin_get_remarketing_funnel"),
+      (supabase as any).rpc("admin_get_remarketing_conversions"),
     ]);
     setLoading(false);
     if (leadsRes.error) toast.error("Erro leads: " + leadsRes.error.message);
@@ -102,6 +111,16 @@ const AdminRemarketing = () => {
         clicked: Number(f.clicked) || 0,
         clicked_and_deposited: Number(f.clicked_and_deposited) || 0,
       });
+    }
+    if (Array.isArray(convRes?.data)) {
+      setConversions(
+        (convRes.data as any[]).map((r) => ({
+          user_id: r.user_id,
+          email: r.email,
+          amount: Number(r.amount) || 0,
+          deposited_at: r.deposited_at,
+        }))
+      );
     }
   };
 
@@ -321,12 +340,49 @@ const AdminRemarketing = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
-        <MetricCard label="Prontos para envio" value={eligible.length} highlight />
-        
-        <MetricCard label="Sem telefone" value={noPhone} />
+        <MetricCard
+          label="Total depositado via link 💰"
+          value={`R$ ${conversions.reduce((s, c) => s + c.amount, 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          highlight
+        />
+        <MetricCard label="Depósitos pelo link" value={conversions.length} />
       </div>
+
+      {conversions.length > 0 && (
+        <div className="rounded-xl border border-border overflow-hidden">
+          <div className="p-3 bg-secondary">
+            <span className="text-xs text-muted-foreground">
+              💸 Depósitos vindos do link rastreado ({conversions.length})
+            </span>
+          </div>
+          <div className="overflow-x-auto max-h-[300px]">
+            <table className="w-full text-xs">
+              <thead className="bg-secondary sticky top-0">
+                <tr>
+                  <th className="text-left px-3 py-2 text-muted-foreground font-medium">Email</th>
+                  <th className="text-right px-3 py-2 text-muted-foreground font-medium">Valor</th>
+                  <th className="text-left px-3 py-2 text-muted-foreground font-medium">Data</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {conversions.map((c, i) => (
+                  <tr key={`${c.user_id}-${i}`} className="hover:bg-secondary/30">
+                    <td className="px-3 py-2 text-foreground">{c.email}</td>
+                    <td className="px-3 py-2 text-right text-emerald-500 font-semibold">
+                      R$ {c.amount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {new Date(c.deposited_at).toLocaleString("pt-BR")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {funnel && <FunnelChart funnel={funnel} />}
 
@@ -580,7 +636,7 @@ const AdminRemarketing = () => {
   );
 };
 
-const MetricCard = ({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) => (
+const MetricCard = ({ label, value, highlight }: { label: string; value: number | string; highlight?: boolean }) => (
   <div
     className={`p-4 rounded-2xl border ${
       highlight ? "bg-primary/10 border-primary/40" : "bg-card border-border"
