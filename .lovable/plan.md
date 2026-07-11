@@ -1,31 +1,32 @@
-## O que já existe hoje
+## Problema
 
-No painel **Remarketing → Configurações do WhatsApp automático** tem o checkbox:
+Os 6 leads aparecem como "✓ enviado" na tabela `whatsapp_campaigns` porque o Z-API aceitou o request, mas o WhatsApp da instância caiu à 01h10 e as mensagens nunca saíram de fato. Como o cron pula quem já está registrado como enviado, ele não vai reenviar sozinho.
 
-> ☑️ **Envio automático ativado (roda a cada 10 min via cron)**
+## Solução
 
-Esse checkbox **já funciona como pausar/despausar**:
-- ☑️ marcado + **Salvar configurações** → cron dispara normalmente
-- ☐ desmarcado + **Salvar configurações** → cron para de enviar (fica "pausado"), mas mantém a data de ativação e toda a configuração intacta
+**Passo único, manual e pontual** (não muda nenhuma lógica do sistema):
 
-O problema é que isso não está óbvio — parece só uma config, não um botão de pausar.
+1. Identificar os 6 e-mails afetados na tabela `whatsapp_campaigns`:
+   - joaciextreme@gmail.com
+   - ezequielvieira2712@gmail.com
+   - yago29072001@gmail.com
+   - adrieleckert22@gmail.com
+   - luiz.talcantara@gmail.com
+   - netoroosevelt91@gmail.com
 
-## O que vou mudar
+2. **Apagar apenas o registro `sem_deposito_1h` desses 6 usuários** em `whatsapp_campaigns`. Isso os torna elegíveis de novo (o cron/manual verifica `already_messaged` por essa tabela).
 
-Deixar o controle de pausar/retomar **explícito e visual**, sem mexer em nenhuma lógica do backend (o cron continua olhando o mesmo campo `whatsapp_enabled`).
+3. **Também apagar os `short_links` gerados anteriormente para eles nessa campanha**, pra que o disparo crie links novos e limpos (evita link "queimado" que nunca foi clicado).
 
-1. **Card de status no topo do bloco de configurações**, mostrando claramente:
-   - 🟢 **Ativo** — "Disparos automáticos rodando a cada 10 min" + botão **⏸ Pausar disparos**
-   - 🟠 **Pausado** — "Nenhum lead está recebendo mensagens" + botão **▶ Retomar disparos**
+4. **Chamar a Edge Function `send-remarketing-whatsapp` em modo manual** (`{ "manual": true }`), que vai buscar os elegíveis e enviar imagem + texto para os 6 (mais qualquer outro que já esteja no critério de 4h sem depósito).
 
-2. Os botões **Pausar / Retomar** salvam a mudança **imediatamente** (um clique só — não precisa clicar em "Salvar configurações" depois).
+## Verificação
 
-3. Manter o checkbox atual escondido/removido do formulário (para não confundir com duas formas de fazer a mesma coisa).
+- Confirmar no retorno da função: `sent` deve ser ≥ 6.
+- Checar `whatsapp_campaigns` para ver os 6 com novo `sent_at` de agora.
+- Se o teu WhatsApp cair de novo no meio, o CallMeBot já te avisa.
 
-4. Deixar claro na tela que **pausar não apaga nada**: a data de ativação, template e leads elegíveis continuam salvos — ao retomar, o próximo cron (até 10 min depois) volta a enviar de onde parou.
+## Nada muda no código
 
-## Detalhes técnicos
-
-- Arquivo único: `src/components/admin/AdminRemarketing.tsx`
-- Nova função `togglePause()` que chama o mesmo RPC `admin_update_remarketing_settings` já existente, alternando só o `_enabled`
-- Nenhuma migration, nenhuma edge function, nenhum secret novo
+- Sem migração, sem edit de função, sem alteração de UI.
+- Apenas 2 comandos SQL de limpeza + 1 chamada à edge function existente.
