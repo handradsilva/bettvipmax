@@ -483,8 +483,18 @@ const AdminRemarketing = () => {
       </div>
 
       <div className="rounded-xl border border-border overflow-hidden">
-        <div className="p-3 bg-secondary text-xs text-muted-foreground">
-          Leads elegíveis (cadastrados há mais de 1h e sem depósito confirmado)
+        <div className="p-3 bg-secondary flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-muted-foreground">
+            Leads elegíveis (cadastrados há mais de 1h e sem depósito confirmado)
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={generateAllMissing} size="sm" variant="outline" disabled={generatingLinks} className="gap-2 h-7 text-xs">
+              {generatingLinks ? "Gerando..." : "Gerar links faltantes"}
+            </Button>
+            <Button onClick={exportCsv} size="sm" variant="default" disabled={generatingLinks} className="gap-2 h-7 text-xs">
+              <Download size={12} /> Exportar (nome, telefone, link)
+            </Button>
+          </div>
         </div>
         <div className="overflow-x-auto max-h-[500px]">
           <table className="w-full text-xs">
@@ -495,31 +505,64 @@ const AdminRemarketing = () => {
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">Telefone</th>
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">Cadastro</th>
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">Status</th>
+                <th className="text-left px-3 py-2 text-muted-foreground font-medium">Link especial bônus</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredLeads.slice(0, 200).map((l) => (
-                <tr key={l.user_id} className="hover:bg-secondary/30">
-                  <td className="px-3 py-2 text-foreground">{l.email}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{l.full_name || "—"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{l.phone || "❌ sem"}</td>
-                  <td className="px-3 py-2 text-muted-foreground">
-                    {new Date(l.created_at).toLocaleString("pt-BR")}
-                  </td>
-                  <td className="px-3 py-2">
-                    {l.already_messaged ? (
-                      <span className="text-emerald-500">✓ enviado</span>
-                    ) : l.phone ? (
-                      <span className="text-primary">pronto</span>
-                    ) : (
-                      <span className="text-destructive">sem telefone</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {filteredLeads.slice(0, 200).map((l) => {
+                const link = shortLinks[l.user_id];
+                return (
+                  <tr key={l.user_id} className="hover:bg-secondary/30">
+                    <td className="px-3 py-2 text-foreground">{l.email}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{l.full_name || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{l.phone || "❌ sem"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {new Date(l.created_at).toLocaleString("pt-BR")}
+                    </td>
+                    <td className="px-3 py-2">
+                      {l.already_messaged ? (
+                        <span className="text-emerald-500">✓ enviado</span>
+                      ) : l.phone ? (
+                        <span className="text-primary">pronto</span>
+                      ) : (
+                        <span className="text-destructive">sem telefone</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      {link ? (
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary underline underline-offset-2 truncate max-w-[220px] inline-block"
+                            title={link}
+                          >
+                            {link.replace(/^https?:\/\//, "")}
+                          </a>
+                          <button
+                            onClick={() => copyLink(l)}
+                            className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground"
+                            title="Copiar link"
+                          >
+                            <Copy size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => ensureLinkForLead(l)}
+                          className="text-[11px] px-2 py-1 rounded border border-border hover:bg-secondary text-muted-foreground"
+                        >
+                          Gerar link
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
               {filteredLeads.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     Nenhum lead no período selecionado
                   </td>
                 </tr>
