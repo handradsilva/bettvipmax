@@ -324,7 +324,7 @@ const AdminRemarketing = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
         <MetricCard label="Prontos para envio" value={eligible.length} highlight />
-        <MetricCard label="Já receberam WhatsApp" value={filteredLeads.filter((l) => l.already_messaged).length} />
+        
         <MetricCard label="Sem telefone" value={noPhone} />
       </div>
 
