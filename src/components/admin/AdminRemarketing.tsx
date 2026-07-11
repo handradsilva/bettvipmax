@@ -324,7 +324,7 @@ const AdminRemarketing = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard label="Leads sem depósito" value={filteredLeads.length} />
         <MetricCard label="Prontos para envio" value={eligible.length} highlight />
-        <MetricCard label="Já receberam WhatsApp" value={filteredLeads.filter((l) => l.already_messaged).length} />
+        
         <MetricCard label="Sem telefone" value={noPhone} />
       </div>
 
@@ -603,20 +603,13 @@ const FunnelChart = ({ funnel }: { funnel: Funnel }) => {
       sub: "Total desde a ativação",
     },
     {
-      label: "Receberam WhatsApp (1h+)",
-      value: funnel.messaged,
-      pct: pct(funnel.messaged),
-      color: "bg-emerald-500",
-      sub: `${pct(funnel.messaged)}% dos leads sem depósito`,
-    },
-    {
       label: "Clicaram no link",
       value: funnel.clicked,
       pct: pct(funnel.clicked),
       color: "bg-primary",
       sub:
-        funnel.messaged > 0
-          ? `${Math.round((funnel.clicked / funnel.messaged) * 100)}% de CTR sobre enviados`
+        funnel.total_no_deposit > 0
+          ? `${pct(funnel.clicked)}% de CTR sobre a base`
           : "—",
     },
     {
