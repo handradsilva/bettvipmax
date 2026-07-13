@@ -1,32 +1,20 @@
-## Problema
+## Objetivo
+Remover 4 usuários de teste e 2 depósitos falsos de R$ 1.010,00 do banco de dados.
 
-Os 6 leads aparecem como "✓ enviado" na tabela `whatsapp_campaigns` porque o Z-API aceitou o request, mas o WhatsApp da instância caiu à 01h10 e as mensagens nunca saíram de fato. Como o cron pula quem já está registrado como enviado, ele não vai reenviar sozinho.
+## Ações
 
-## Solução
+1. **Excluir depósitos falsos** (`transactions`)
+   - Deletar os 2 depósitos `completed` de R$ 1.010,00 dos usuários `kyros-enum-1783928228@...` e `kyros-webhook-1783926725@...` da madrugada de 13/07/2026.
 
-**Passo único, manual e pontual** (não muda nenhuma lógica do sistema):
+2. **Excluir os 4 usuários de teste**
+   - Emails alvo:
+     - kyros-enum-1783928228@test-kyros.invalid
+     - kyros-webhook-1783926725@test-kyros.invalid
+     - kyros-ref-19307@test-kyros.invalid
+     - kyros-test-8015@test-kyros.invalid
+   - Limpar dados relacionados: `transactions`, `referrals`, `promo_clicks`, `whatsapp_campaigns`, `user_roles`, `profiles`.
+   - Deletar o registro em `auth.users` (cascata elimina o restante que dependa dele).
 
-1. Identificar os 6 e-mails afetados na tabela `whatsapp_campaigns`:
-   - joaciextreme@gmail.com
-   - ezequielvieira2712@gmail.com
-   - yago29072001@gmail.com
-   - adrieleckert22@gmail.com
-   - luiz.talcantara@gmail.com
-   - netoroosevelt91@gmail.com
-
-2. **Apagar apenas o registro `sem_deposito_1h` desses 6 usuários** em `whatsapp_campaigns`. Isso os torna elegíveis de novo (o cron/manual verifica `already_messaged` por essa tabela).
-
-3. **Também apagar os `short_links` gerados anteriormente para eles nessa campanha**, pra que o disparo crie links novos e limpos (evita link "queimado" que nunca foi clicado).
-
-4. **Chamar a Edge Function `send-remarketing-whatsapp` em modo manual** (`{ "manual": true }`), que vai buscar os elegíveis e enviar imagem + texto para os 6 (mais qualquer outro que já esteja no critério de 4h sem depósito).
-
-## Verificação
-
-- Confirmar no retorno da função: `sent` deve ser ≥ 6.
-- Checar `whatsapp_campaigns` para ver os 6 com novo `sent_at` de agora.
-- Se o teu WhatsApp cair de novo no meio, o CallMeBot já te avisa.
-
-## Nada muda no código
-
-- Sem migração, sem edit de função, sem alteração de UI.
-- Apenas 2 comandos SQL de limpeza + 1 chamada à edge function existente.
+## Observações
+- Ação irreversível — os registros somem permanentemente do painel Admin (Usuários, Depósitos, Dashboard).
+- Saldos derivados desses depósitos também serão removidos junto com os perfis.
