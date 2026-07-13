@@ -50,6 +50,13 @@ const Auth = () => {
 
     try {
       if (isRegister) {
+        const emailDomain = email.trim().toLowerCase().split("@")[1] || "";
+        const allowedDomains = ["gmail.com", "outlook.com", "hotmail.com", "live.com", "outlook.com.br"];
+        if (!allowedDomains.includes(emailDomain)) {
+          toast({ title: "E-mail não permitido", description: "Apenas e-mails @gmail.com ou @outlook.com são aceitos no cadastro.", variant: "destructive" });
+          setLoading(false);
+          return;
+        }
         if (!isValidCPF(cpf)) {
           toast({ title: "CPF inválido", description: "Digite um CPF real válido para concluir o cadastro.", variant: "destructive" });
           setLoading(false);
