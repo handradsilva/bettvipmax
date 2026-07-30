@@ -1,0 +1,14 @@
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_all_profiles(integer, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_all_referrals(integer, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_all_transactions(integer, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_campaigns(integer, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_leads_without_deposit(numeric) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_remarketing_conversions() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_get_remarketing_funnel() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_toggle_affiliate(uuid, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_balance(uuid, numeric) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_remarketing_settings(boolean, text, numeric, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_remarketing_settings(boolean, text, numeric, text, timestamptz) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_update_remarketing_settings(boolean, text, numeric, text, timestamptz, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.resolve_short_link(text) TO anon, authenticated;
