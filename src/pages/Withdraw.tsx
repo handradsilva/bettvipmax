@@ -53,6 +53,10 @@ const Withdraw = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth?mode=login");
+  }, [authLoading, user, navigate]);
+
   if (authLoading || !user) return null;
 
   const balance = profile?.balance ?? 0;

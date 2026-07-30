@@ -51,6 +51,10 @@ const Deposit = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth?mode=login");
+  }, [authLoading, user, navigate]);
+
   if (authLoading || !user) return null;
 
   const startPolling = (ref: string) => {
