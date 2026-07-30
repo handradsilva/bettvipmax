@@ -26,7 +26,7 @@ const POLL_INTERVAL = 5000;
 const MAX_POLLS = 120;
 
 const Withdraw = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [amount, setAmount] = useState("");
   const [pixKey, setPixKey] = useState(profile?.pix_key || "");
@@ -53,10 +53,11 @@ const Withdraw = () => {
     };
   }, []);
 
-  if (!user) {
-    navigate("/auth?mode=login");
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth?mode=login");
+  }, [authLoading, user, navigate]);
+
+  if (authLoading || !user) return null;
 
   const balance = profile?.balance ?? 0;
   const formattedBalance = `R$ ${balance.toFixed(2).replace(".", ",")}`;

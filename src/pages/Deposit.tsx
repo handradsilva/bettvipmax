@@ -17,7 +17,7 @@ const POLL_INTERVAL = 2000;
 const MAX_POLLS = 300; // 10 minutes (300 * 2s)
 
 const Deposit = () => {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [amount, setAmount] = useState("");
@@ -51,10 +51,11 @@ const Deposit = () => {
     };
   }, []);
 
-  if (!user) {
-    navigate("/auth?mode=login");
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth?mode=login");
+  }, [authLoading, user, navigate]);
+
+  if (authLoading || !user) return null;
 
   const startPolling = (ref: string) => {
     if (pollRef.current) clearInterval(pollRef.current);
