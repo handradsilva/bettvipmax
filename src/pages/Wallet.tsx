@@ -14,11 +14,12 @@ interface Transaction {
 }
 
 const Wallet = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate("/auth?mode=login");
       return;
@@ -33,9 +34,9 @@ const Wallet = () => {
       if (data) setTransactions(data as Transaction[]);
     };
     fetchTransactions();
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
-  if (!user) return null;
+  if (authLoading || !user) return null;
 
   const balance = profile?.balance ?? 0;
   const formattedBalance = `R$ ${balance.toFixed(2).replace(".", ",")}`;

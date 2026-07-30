@@ -15,7 +15,7 @@ interface ReferralStats {
 }
 
 const Affiliate = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState<ReferralStats>({
     total_referred: 0,
@@ -26,12 +26,13 @@ const Affiliate = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate("/auth?mode=login");
       return;
     }
     fetchStats();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchStats = async () => {
     if (!user) return;
@@ -69,7 +70,7 @@ const Affiliate = () => {
     toast({ title: "Link copiado!", description: "Compartilhe com seus amigos." });
   };
 
-  if (!user) return null;
+  if (authLoading || !user) return null;
 
   return (
     <Layout>

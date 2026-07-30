@@ -5,13 +5,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { User, Phone, Mail, CreditCard, Calendar } from "lucide-react";
 
 const MyAccount = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  if (!user) {
-    navigate("/auth?mode=login");
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth?mode=login");
+  }, [authLoading, user, navigate]);
+
+  if (authLoading || !user) return null;
 
   const createdAt = user.created_at
     ? new Date(user.created_at).toLocaleString("pt-BR", {
