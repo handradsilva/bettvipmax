@@ -126,6 +126,45 @@ const AdminDashboard = ({ profiles, transactions, referrals, refetch }: Props) =
     });
   }, [paidDeposits, profiles, startDate, endDate]);
 
+  const hourlyData = useMemo(() => {
+    const buckets = Array.from({ length: 24 }, (_, h) => ({
+      name: `${String(h).padStart(2, "0")}h`,
+      qtd: 0,
+      valor: 0,
+    }));
+    paidDeposits.forEach((t) => {
+      const h = parseISO(t.created_at).getHours();
+      buckets[h].qtd += 1;
+      buckets[h].valor += t.amount;
+    });
+    return buckets;
+  }, [paidDeposits]);
+
+  const weekdayData = useMemo(() => {
+    const labels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    const buckets = labels.map((name) => ({ name, qtd: 0, valor: 0 }));
+    paidDeposits.forEach((t) => {
+      const d = parseISO(t.created_at).getDay();
+      buckets[d].qtd += 1;
+      buckets[d].valor += t.amount;
+    });
+    // Segunda -> Domingo
+    return [...buckets.slice(1), buckets[0]];
+  }, [paidDeposits]);
+
+  const peakTooltip = {
+    contentStyle: {
+      background: "hsl(var(--card))",
+      border: "1px solid hsl(var(--border))",
+      borderRadius: 8,
+      fontSize: 12,
+    },
+    formatter: (value: number, name: string) =>
+      name === "valor"
+        ? [`R$ ${Number(value).toFixed(2).replace(".", ",")}`, "Valor"]
+        : [value, "Qtd. PIX"],
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
