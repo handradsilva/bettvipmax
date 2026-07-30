@@ -259,7 +259,6 @@ const AdminDashboard = ({ profiles, transactions, referrals, refetch }: Props) =
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
               <Tooltip cursor={{ fill: "hsl(var(--primary) / 0.08)" }} {...peakTooltip} />
               <Bar dataKey="qtd" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="valor" fill="hsl(var(--primary) / 0.35)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
