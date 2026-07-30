@@ -126,6 +126,45 @@ const AdminDashboard = ({ profiles, transactions, referrals, refetch }: Props) =
     });
   }, [paidDeposits, profiles, startDate, endDate]);
 
+  const hourlyData = useMemo(() => {
+    const buckets = Array.from({ length: 24 }, (_, h) => ({
+      name: `${String(h).padStart(2, "0")}h`,
+      qtd: 0,
+      valor: 0,
+    }));
+    paidDeposits.forEach((t) => {
+      const h = parseISO(t.created_at).getHours();
+      buckets[h].qtd += 1;
+      buckets[h].valor += t.amount;
+    });
+    return buckets;
+  }, [paidDeposits]);
+
+  const weekdayData = useMemo(() => {
+    const labels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    const buckets = labels.map((name) => ({ name, qtd: 0, valor: 0 }));
+    paidDeposits.forEach((t) => {
+      const d = parseISO(t.created_at).getDay();
+      buckets[d].qtd += 1;
+      buckets[d].valor += t.amount;
+    });
+    // Segunda -> Domingo
+    return [...buckets.slice(1), buckets[0]];
+  }, [paidDeposits]);
+
+  const peakTooltip = {
+    contentStyle: {
+      background: "hsl(var(--card))",
+      border: "1px solid hsl(var(--border))",
+      borderRadius: 8,
+      fontSize: 12,
+    },
+    formatter: (value: number, name: string) =>
+      name === "valor"
+        ? [`R$ ${Number(value).toFixed(2).replace(".", ",")}`, "Valor"]
+        : [value, "Qtd. PIX"],
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -193,6 +232,33 @@ const AdminDashboard = ({ profiles, transactions, referrals, refetch }: Props) =
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
               <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
               <Bar dataKey="users" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <div className="p-4 rounded-2xl bg-card border border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-4">Picos de PIX por Horário</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={hourlyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} interval={1} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <Tooltip cursor={{ fill: "hsl(var(--primary) / 0.08)" }} {...peakTooltip} />
+              <Bar dataKey="qtd" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="p-4 rounded-2xl bg-card border border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-4">Picos de PIX por Dia da Semana</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={weekdayData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <Tooltip cursor={{ fill: "hsl(var(--primary) / 0.08)" }} {...peakTooltip} />
+              <Bar dataKey="qtd" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
