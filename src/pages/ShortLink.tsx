@@ -13,16 +13,16 @@ const ShortLink = () => {
         navigate("/", { replace: true });
         return;
       }
-      const { data } = await (supabase as any)
-        .from("short_links")
-        .select("user_id, campaign_key, promo_code, source")
-        .eq("code", c)
-        .maybeSingle();
+      const { data: rows } = await (supabase as any).rpc("resolve_short_link", {
+        _code: c,
+      });
+      const data = Array.isArray(rows) ? rows[0] : rows;
 
       if (!data) {
         navigate("/", { replace: true });
         return;
       }
+
 
       // Redirect to the existing promo flow with original tracking params.
       // Promo.tsx already inserts into promo_clicks and handles the bonus.

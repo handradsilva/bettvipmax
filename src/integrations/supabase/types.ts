@@ -477,6 +477,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      resolve_short_link: {
+        Args: { _code: string }
+        Returns: {
+          campaign_key: string
+          promo_code: string
+          source: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
