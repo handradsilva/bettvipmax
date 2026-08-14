@@ -1,7 +1,19 @@
 import { useState, useMemo } from "react";
 import { format, parseISO, startOfDay, endOfDay, isAfter, isBefore } from "date-fns";
-import { Search, ArrowDownCircle } from "lucide-react";
+import { Search, ArrowDownCircle, Trash2, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import type { AdminProfile, AdminTransaction } from "@/hooks/useAdminData";
 import AdminDateFilter from "./AdminDateFilter";
 import UserDetailModal from "./UserDetailModal";
@@ -9,13 +21,38 @@ import UserDetailModal from "./UserDetailModal";
 interface Props {
   profiles: AdminProfile[];
   transactions?: AdminTransaction[];
+  refetch?: () => Promise<void> | void;
 }
 
-const AdminUsers = ({ profiles, transactions = [] }: Props) => {
+const AdminUsers = ({ profiles, transactions = [], refetch }: Props) => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState<Date>(new Date(2026, 0, 1));
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [selected, setSelected] = useState<AdminProfile | null>(null);
+  const [toDelete, setToDelete] = useState<AdminProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!toDelete) return;
+    setDeleting(true);
+    const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+      body: { user_id: toDelete.user_id },
+    });
+    setDeleting(false);
+
+    if (error || (data as { error?: string })?.error) {
+      toast({
+        title: "Erro ao excluir usuário",
+        description: (data as { error?: string })?.error || error?.message || "Tente novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({ title: "Usuário excluído", description: toDelete.email });
+    setToDelete(null);
+    await refetch?.();
+  };
 
   const depositMap = useMemo(() => {
     const map = new Map<string, { count: number; total: number; first?: AdminTransaction }>();
