@@ -112,6 +112,7 @@ const AdminUsers = ({ profiles, transactions = [], refetch }: Props) => {
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Depositou</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Total Dep.</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Indicado por</th>
+                <th className="text-right px-4 py-3 text-muted-foreground font-medium">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
