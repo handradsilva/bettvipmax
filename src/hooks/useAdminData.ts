@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -49,8 +49,11 @@ export const useAdminData = () => {
   const [profiles, setProfiles] = useState<AdminProfile[]>([]);
   const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
   const [referrals, setReferrals] = useState<AdminReferral[]>([]);
+  const adminCheckId = useRef(0);
 
   const checkAdmin = useCallback(async () => {
+    const checkId = ++adminCheckId.current;
+
     if (!user) {
       setIsAdmin(false);
       setLoading(false);
@@ -58,6 +61,8 @@ export const useAdminData = () => {
     }
 
     const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    if (checkId !== adminCheckId.current) return;
+
     setIsAdmin(!!data);
     setLoading(false);
   }, [user]);
