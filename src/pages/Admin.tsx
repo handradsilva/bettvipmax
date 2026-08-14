@@ -85,7 +85,7 @@ const Admin = () => {
             <AdminAffiliates profiles={profiles} referrals={referrals} transactions={transactions} toggleAffiliate={toggleAffiliate} />
           </TabsContent>
           <TabsContent value="users">
-            <AdminUsers profiles={profiles} transactions={transactions} />
+            <AdminUsers profiles={profiles} transactions={transactions} refetch={refetch} />
           </TabsContent>
           <TabsContent value="deposits">
             <AdminDeposits transactions={transactions} profiles={profiles} />

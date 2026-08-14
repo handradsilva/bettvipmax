@@ -1,7 +1,19 @@
 import { useState, useMemo } from "react";
 import { format, parseISO, startOfDay, endOfDay, isAfter, isBefore } from "date-fns";
-import { Search, ArrowDownCircle } from "lucide-react";
+import { Search, ArrowDownCircle, Trash2, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import type { AdminProfile, AdminTransaction } from "@/hooks/useAdminData";
 import AdminDateFilter from "./AdminDateFilter";
 import UserDetailModal from "./UserDetailModal";
@@ -9,13 +21,38 @@ import UserDetailModal from "./UserDetailModal";
 interface Props {
   profiles: AdminProfile[];
   transactions?: AdminTransaction[];
+  refetch?: () => Promise<void> | void;
 }
 
-const AdminUsers = ({ profiles, transactions = [] }: Props) => {
+const AdminUsers = ({ profiles, transactions = [], refetch }: Props) => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState<Date>(new Date(2026, 0, 1));
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [selected, setSelected] = useState<AdminProfile | null>(null);
+  const [toDelete, setToDelete] = useState<AdminProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!toDelete) return;
+    setDeleting(true);
+    const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+      body: { user_id: toDelete.user_id },
+    });
+    setDeleting(false);
+
+    if (error || (data as { error?: string })?.error) {
+      toast({
+        title: "Erro ao excluir usuário",
+        description: (data as { error?: string })?.error || error?.message || "Tente novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({ title: "Usuário excluído", description: toDelete.email });
+    setToDelete(null);
+    await refetch?.();
+  };
 
   const depositMap = useMemo(() => {
     const map = new Map<string, { count: number; total: number; first?: AdminTransaction }>();
@@ -75,6 +112,7 @@ const AdminUsers = ({ profiles, transactions = [] }: Props) => {
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Depositou</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Total Dep.</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Indicado por</th>
+                <th className="text-right px-4 py-3 text-muted-foreground font-medium">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -108,11 +146,23 @@ const AdminUsers = ({ profiles, transactions = [] }: Props) => {
                       {dep ? `R$ ${dep.total.toFixed(2).replace(".", ",")}` : "—"}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{referrer ? referrer.email : "—"}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setToDelete(p);
+                        }}
+                        aria-label={`Excluir ${p.email}`}
+                        className="inline-flex items-center justify-center h-7 w-7 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Nenhum usuário encontrado</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Nenhum usuário encontrado</td></tr>
               )}
             </tbody>
           </table>
@@ -127,6 +177,32 @@ const AdminUsers = ({ profiles, transactions = [] }: Props) => {
         open={!!selected}
         onClose={() => setSelected(null)}
       />
+
+      <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && !deleting && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir usuário?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O usuário <span className="font-semibold text-foreground">{toDelete?.email}</span> será removido
+              permanentemente, junto com seus depósitos, saques, indicações e acesso de login. Esta ação não pode ser
+              desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : "Excluir definitivamente"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
