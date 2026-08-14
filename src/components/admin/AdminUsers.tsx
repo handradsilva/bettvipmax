@@ -146,11 +146,23 @@ const AdminUsers = ({ profiles, transactions = [], refetch }: Props) => {
                       {dep ? `R$ ${dep.total.toFixed(2).replace(".", ",")}` : "—"}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{referrer ? referrer.email : "—"}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setToDelete(p);
+                        }}
+                        aria-label={`Excluir ${p.email}`}
+                        className="inline-flex items-center justify-center h-7 w-7 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Nenhum usuário encontrado</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Nenhum usuário encontrado</td></tr>
               )}
             </tbody>
           </table>
