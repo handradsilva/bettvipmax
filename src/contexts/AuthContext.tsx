@@ -34,12 +34,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", userId)
       .single();
-    if (data) setProfile(data as Profile);
+    if (error) {
+      setProfile(null);
+      return;
+    }
+    setProfile(data as Profile);
   };
 
   const refreshProfile = async () => {
@@ -47,29 +51,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    let active = true;
+    let profileRequest = 0;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        if (!active) return;
+
+        const requestId = ++profileRequest;
         setSession(session);
         setUser(session?.user ?? null);
+        setProfile(null);
+
         if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 500);
+          setLoading(true);
+          const userId = session.user.id;
+          setTimeout(async () => {
+            await fetchProfile(userId);
+            if (active && requestId === profileRequest) setLoading(false);
+          }, 0);
         } else {
-          setProfile(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, phone?: string, cpf?: string, ref?: string, fullName?: string) => {
@@ -83,6 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (!error && data.user) {
+      const userId = data.user.id;
       // Update profile with name, phone, cpf, and referred_by
       setTimeout(async () => {
         const updateData: Record<string, any> = { phone, cpf, full_name: fullName };
@@ -92,8 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await supabase
           .from("profiles")
           .update(updateData)
-          .eq("user_id", data.user!.id);
-        await fetchProfile(data.user!.id);
+          .eq("user_id", userId);
+        await fetchProfile(userId);
       }, 1000);
     }
 
