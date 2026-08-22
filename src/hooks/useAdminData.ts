@@ -44,6 +44,7 @@ const PAGE_SIZE = 5000;
 
 export const useAdminData = () => {
   const { user } = useAuth();
+  const userId = user?.id ?? null;
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<AdminProfile[]>([]);
@@ -54,18 +55,18 @@ export const useAdminData = () => {
   const checkAdmin = useCallback(async () => {
     const checkId = ++adminCheckId.current;
 
-    if (!user) {
+    if (!userId) {
       setIsAdmin(false);
       setLoading(false);
       return;
     }
 
-    const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (checkId !== adminCheckId.current) return;
 
     setIsAdmin(!!data);
     setLoading(false);
-  }, [user]);
+  }, [userId]);
 
   const fetchPaginatedRpc = useCallback(
     async <T,>(rpcName: "admin_get_all_profiles" | "admin_get_all_transactions" | "admin_get_all_referrals") => {
@@ -93,7 +94,7 @@ export const useAdminData = () => {
   );
 
   const fetchAll = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
 
     const [allProfiles, allTransactions, allReferrals] = await Promise.all([
       fetchPaginatedRpc<AdminProfile>("admin_get_all_profiles"),
@@ -104,7 +105,7 @@ export const useAdminData = () => {
     setProfiles(allProfiles);
     setTransactions(allTransactions);
     setReferrals(allReferrals);
-  }, [user, fetchPaginatedRpc]);
+  }, [userId, fetchPaginatedRpc]);
 
   useEffect(() => {
     checkAdmin();
