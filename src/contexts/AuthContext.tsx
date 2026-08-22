@@ -53,24 +53,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let active = true;
     let profileRequest = 0;
+    let currentUserId: string | null = null;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (!active) return;
 
+        const nextUserId = session?.user?.id ?? null;
+        const isSameUser = nextUserId !== null && nextUserId === currentUserId;
         const requestId = ++profileRequest;
+
         setSession(session);
         setUser(session?.user ?? null);
-        setProfile(null);
 
         if (session?.user) {
-          setLoading(true);
+          // Only show the loading screen / clear data when the user actually changes.
+          // Token refreshes (e.g. returning to the tab) must not reset the UI.
+          if (!isSameUser) {
+            setProfile(null);
+            setLoading(true);
+          }
+          currentUserId = nextUserId;
           const userId = session.user.id;
           setTimeout(async () => {
             await fetchProfile(userId);
             if (active && requestId === profileRequest) setLoading(false);
           }, 0);
         } else {
+          currentUserId = null;
+          setProfile(null);
           setLoading(false);
         }
       }
