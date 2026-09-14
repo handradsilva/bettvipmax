@@ -195,6 +195,7 @@ const Header = ({ onToggleSidebar, sidebarOpen }: HeaderProps) => {
         </Link>
       </div>
     </header>
+    </>
   );
 };
 
