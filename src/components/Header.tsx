@@ -26,20 +26,7 @@ const Header = ({ onToggleSidebar, sidebarOpen }: HeaderProps) => {
   };
 
   return (
-    <>
-      {/* Promotional top bar */}
-      <div className="bg-primary text-primary-foreground text-center py-2 px-3 text-xs sm:text-sm font-semibold tracking-wide z-50 relative">
-        🎁 Indique e Ganhe: Amigo depositou{" "}
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-background text-primary text-xs sm:text-sm font-extrabold mx-0.5">
-          R$ 50
-        </span>
-        , você ganha{" "}
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-background text-primary text-xs sm:text-sm font-extrabold mx-0.5">
-          R$ 50
-        </span>
-        ! Oferta válida até o fim de setembro.
-      </div>
-      <header className="sticky top-0 z-50 bg-background border-b border-border">
+    <header className="sticky top-0 z-50 bg-background border-b border-border">
       <div className="flex items-center justify-between h-14 px-2 sm:px-3 md:px-6">
         {/* Left */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
