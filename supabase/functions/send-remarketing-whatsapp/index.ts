@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
       }
       let zapiPhone = phone;
       if (provider !== "evolution") zapiPhone = await resolveZapiWhatsappPhone(phone);
-      const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
+      const siteUrl = Deno.env.get("SITE_URL") || "https://maxvipbet.com";
       const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
       let trackedLink = `${siteUrl}/promo/${promoCode}?c=${CAMPAIGN_KEY}&s=whatsapp_test`;
       try {
@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
       const nome = (testName || "amigo").split(" ")[0];
       const message = template
         .replaceAll("{nome}", nome)
-        .replaceAll("{email}", "teste@bettvipmax.com")
+        .replaceAll("{email}", "teste@maxvipbet.com")
         .replaceAll("{link}", trackedLink);
       try {
         let imageRes: any = null;
@@ -288,7 +288,7 @@ Deno.serve(async (req) => {
       }
       let sendPhone = phone;
       const nome = (lead.full_name || lead.email.split("@")[0] || "amigo").split(" ")[0];
-      const siteUrl = Deno.env.get("SITE_URL") || "https://www.bettvipmax.com";
+      const siteUrl = Deno.env.get("SITE_URL") || "https://maxvipbet.com";
       const promoCode = Deno.env.get("REMARKETING_PROMO_CODE") || "VOLTA200";
 
       // Generate a short tracking link (e.g. https://site/r/aB3xY9) instead of

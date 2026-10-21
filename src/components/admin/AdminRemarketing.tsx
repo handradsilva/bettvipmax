@@ -41,7 +41,7 @@ interface Conversion {
 }
 
 const CAMPAIGN_KEY = "sem_deposito_1h";
-const SITE_URL = "https://www.bettvipmax.com";
+const SITE_URL = "https://maxvipbet.com";
 const PROMO_CODE = "VOLTA200";
 
 const genCode = () => {

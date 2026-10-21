@@ -11,14 +11,14 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-10">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <Link to="/" title="BetVipMax - betvipmax - Página Inicial">
-            <img src="/images/logo.avif" alt="BetVipMax - betvipmax logo" className="h-8 sm:h-10" />
+          <Link to="/" title="MAXVIPBET - maxvipbet - Página Inicial">
+            <img src="/images/logo.webp" alt="MAXVIPBET - maxvipbet logo" className="h-8 sm:h-10" />
           </Link>
         </div>
 
         {/* SEO keyword-rich description */}
         <p className="text-center text-xs text-muted-foreground mb-6 max-w-2xl mx-auto">
-          <strong>BetVipMax</strong> (betvipmax / vipbetmax / bet vip max) — Sua plataforma de apostas online, cassino ao vivo e esportes. Acesse <strong>bettvipmax.com</strong>.
+          <strong>MAXVIPBET</strong> (maxvipbet / maxvipbet / max vip bet) — Sua plataforma de apostas online, cassino ao vivo e esportes. Acesse <strong>maxvipbet.com</strong>.
         </p>
 
         {/* Internal links for SEO */}
@@ -49,9 +49,9 @@ const Footer = () => {
         {/* Social icons */}
         <div className="flex justify-center gap-3 sm:gap-4 mb-6">
           {[
-            { name: "Instagram BetVipMax", icon: "📸", url: "#" },
-            { name: "YouTube BetVipMax", icon: "▶️", url: "#" },
-            { name: "Telegram BetVipMax", icon: "✈️", url: "#" },
+            { name: "Instagram MAXVIPBET", icon: "📸", url: "#" },
+            { name: "YouTube MAXVIPBET", icon: "▶️", url: "#" },
+            { name: "Telegram MAXVIPBET", icon: "✈️", url: "#" },
           ].map(({ name, icon, url }) => (
             <a
               key={name}
@@ -86,7 +86,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <p className="text-center text-[10px] sm:text-xs text-muted-foreground">
-          © 2024 BetVipMax (betvipmax). Todos os direitos reservados. | Jogue com responsabilidade. | bettvipmax.com
+          © 2024 MAXVIPBET (maxvipbet). Todos os direitos reservados. | Jogue com responsabilidade. | maxvipbet.com
         </p>
 
         {/* Back to top */}

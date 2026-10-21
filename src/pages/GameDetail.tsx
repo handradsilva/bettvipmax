@@ -21,9 +21,9 @@ const GameDetail = () => {
   return (
     <Layout>
       <SEOHead
-        title={`${game.name} | Jogar no BetVipMax - betvipmax`}
-        description={`Jogue ${game.name} de ${game.provider} no BetVipMax (betvipmax). Slots, crash games e cassino ao vivo com bônus exclusivos em bettvipmax.com!`}
-        keywords={`${game.name.toLowerCase()} betvipmax, jogar ${game.name.toLowerCase()}, ${game.provider.toLowerCase()} betvipmax, ${game.name.toLowerCase()} online`}
+        title={`${game.name} | Jogar no MAXVIPBET - maxvipbet`}
+        description={`Jogue ${game.name} de ${game.provider} no MAXVIPBET (maxvipbet). Slots, crash games e cassino ao vivo com bônus exclusivos em maxvipbet.com!`}
+        keywords={`${game.name.toLowerCase()} maxvipbet, jogar ${game.name.toLowerCase()}, ${game.provider.toLowerCase()} maxvipbet, ${game.name.toLowerCase()} online`}
         path={`/game/${game.id}`}
       />
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-5">

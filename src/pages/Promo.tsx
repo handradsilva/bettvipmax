@@ -83,8 +83,8 @@ const Promo = () => {
   return (
     <Layout>
       <SEOHead
-        title="Bônus Especial | BetVipMax"
-        description="Ative seu bônus exclusivo no BetVipMax e comece a jogar com muito mais saldo."
+        title="Bônus Especial | MAXVIPBET"
+        description="Ative seu bônus exclusivo no MAXVIPBET e comece a jogar com muito mais saldo."
         path={`/promo/${codigo}`}
       />
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">

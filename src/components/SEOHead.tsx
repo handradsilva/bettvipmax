@@ -7,15 +7,15 @@ interface SEOHeadProps {
   path?: string;
 }
 
-const DEFAULT_KEYWORDS = "betvipmax, vipbetmax, bet vip max, bettvipmax, betvip max, apostas online, cassino online, apostas esportivas, slots, jogos de cassino, bônus apostas, cassino ao vivo, plinko, mines, aviator, crash games, fortune tiger, fortune dragon, gates of olympus, sweet bonanza";
+const DEFAULT_KEYWORDS = "maxvipbet, maxvipbet, max vip bet, maxvipbet, max vip bet, apostas online, cassino online, apostas esportivas, slots, jogos de cassino, bônus apostas, cassino ao vivo, plinko, mines, aviator, crash games, fortune tiger, fortune dragon, gates of olympus, sweet bonanza";
 
 const SEOHead = ({
-  title = "BetVipMax | Apostas Online, Cassino e Esportes | betvipmax",
-  description = "BetVipMax (betvipmax) - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora em bettvipmax.com!",
+  title = "MAXVIPBET | Apostas Online, Cassino e Esportes | maxvipbet",
+  description = "MAXVIPBET (maxvipbet) - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora em maxvipbet.com!",
   keywords = DEFAULT_KEYWORDS,
   path = "/",
 }: SEOHeadProps) => {
-  const baseUrl = "https://www.bettvipmax.com";
+  const baseUrl = "https://maxvipbet.com";
   const fullUrl = `${baseUrl}${path}`;
 
   useEffect(() => {
