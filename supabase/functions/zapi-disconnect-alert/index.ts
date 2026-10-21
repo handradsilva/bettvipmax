@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   }
 
   const text =
-    `⚠️ *BetVipMax* – WhatsApp da instância Z-API caiu!\n\n` +
+    `⚠️ *MAXVIPBET* – WhatsApp da instância Z-API caiu!\n\n` +
     `🕒 ${when}\n` +
     `📴 Motivo: ${reason}\n\n` +
     `Abra o painel Z-API e escaneie o QR Code para religar o disparo de remarketing.`;

@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const banners = [
-  { src: "/images/banner1.avif", alt: "BetVipMax - betvipmax - Bônus de boas-vindas e promoções exclusivas" },
-  { src: "/images/banner2.avif", alt: "BetVipMax - vipbetmax - Cassino ao vivo e apostas esportivas" },
-  { src: "/images/banner3.avif", alt: "BetVipMax - bet vip max - Crash games, slots e jogos populares" },
+  { src: "/images/banner1.webp", alt: "MAXVIPBET - Bônus de boas-vindas e promoções exclusivas" },
+  { src: "/images/banner2.webp", alt: "MAXVIPBET - Cassino ao vivo e apostas esportivas" },
+  { src: "/images/banner3.webp", alt: "MAXVIPBET - max vip bet - Crash games, slots e jogos populares" },
 ];
 
 const BannerCarousel = () => {
@@ -24,7 +24,7 @@ const BannerCarousel = () => {
   }, [next]);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-lg sm:rounded-xl group max-w-full" role="banner" aria-label="Promoções BetVipMax">
+    <div className="relative w-full overflow-hidden rounded-lg sm:rounded-xl group max-w-full" role="banner" aria-label="Promoções MAXVIPBET">
       <div
         className="flex transition-transform duration-500 ease-out w-full"
         style={{ transform: `translateX(-${current * 100}%)` }}

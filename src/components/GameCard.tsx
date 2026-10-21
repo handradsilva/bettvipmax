@@ -12,12 +12,12 @@ const GameCard = ({ game }: GameCardProps) => {
     <article
       className="group relative rounded-lg sm:rounded-xl overflow-hidden game-card-hover cursor-pointer bg-card"
       onClick={() => navigate(`/game/${game.id}`)}
-      title={`Jogar ${game.name} no BetVipMax - betvipmax`}
+      title={`Jogar ${game.name} no MAXVIPBET`}
     >
       <div className="aspect-square overflow-hidden">
         <img
           src={game.image}
-          alt={`${game.name} - Jogar no BetVipMax (betvipmax)`}
+          alt={`${game.name} - Jogar no MAXVIPBET`}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           loading="lazy"
         />

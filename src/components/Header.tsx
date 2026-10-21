@@ -34,7 +34,7 @@ const Header = ({ onToggleSidebar, sidebarOpen }: HeaderProps) => {
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           <Link to="/">
-            <img src="/images/logo.avif" alt="VIPBetMax" className="h-7 sm:h-8 md:h-9" />
+            <img src="/images/logo.webp" alt="maxvipbet" className="h-7 sm:h-8 md:h-9" />
           </Link>
         </div>
 

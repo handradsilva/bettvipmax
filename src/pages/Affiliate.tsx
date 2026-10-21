@@ -63,7 +63,7 @@ const Affiliate = () => {
   };
 
   const referralCode = (profile as any)?.referral_code || "...";
-  const referralLink = `https://www.bettvipmax.com/?ref=${referralCode}`;
+  const referralLink = `https://maxvipbet.com/?ref=${referralCode}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -75,9 +75,9 @@ const Affiliate = () => {
   return (
     <Layout>
       <SEOHead
-        title="Programa de Afiliados | BetVipMax - betvipmax"
-        description="Ganhe dinheiro indicando amigos no BetVipMax (betvipmax). Programa de afiliados com comissões por cada indicado. Comece agora em bettvipmax.com!"
-        keywords="betvipmax afiliados, programa afiliados betvipmax, vipbetmax afiliado, ganhar dinheiro betvipmax, bettvipmax indicar amigos"
+        title="Programa de Afiliados | MAXVIPBET"
+        description="Ganhe dinheiro indicando amigos no MAXVIPBET. Programa de afiliados com comissões por cada indicado. Comece agora em maxvipbet.com!"
+        keywords="maxvipbet afiliados, programa afiliados maxvipbet afiliado, ganhar dinheiro maxvipbet indicar amigos"
         path="/affiliate"
       />
       <div className="flex items-center justify-center min-h-[70vh]">
