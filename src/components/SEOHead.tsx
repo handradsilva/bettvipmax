@@ -7,7 +7,7 @@ interface SEOHeadProps {
   path?: string;
 }
 
-const DEFAULT_KEYWORDS = "maxvipbet, maxvipbet, max vip bet, maxvipbet, max vip bet, apostas online, cassino online, apostas esportivas, slots, jogos de cassino, bônus apostas, cassino ao vivo, plinko, mines, aviator, crash games, fortune tiger, fortune dragon, gates of olympus, sweet bonanza";
+const DEFAULT_KEYWORDS = "maxvipbet, max vip bet, maxvipbet, max vip bet, apostas online, cassino online, apostas esportivas, slots, jogos de cassino, bônus apostas, cassino ao vivo, plinko, mines, aviator, crash games, fortune tiger, fortune dragon, gates of olympus, sweet bonanza";
 
 const SEOHead = ({
   title = "MAXVIPBET | Apostas Online, Cassino e Esportes | maxvipbet",

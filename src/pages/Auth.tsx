@@ -91,7 +91,7 @@ const Auth = () => {
           ? "Crie sua conta no MAXVIPBET (maxvipbet). Cadastre-se grátis e ganhe bônus no primeiro depósito. Jogue slots, crash games e cassino ao vivo em maxvipbet.com!"
           : "Faça login no MAXVIPBET (maxvipbet). Acesse sua conta para jogar cassino online, slots e apostas esportivas em maxvipbet.com!"
         }
-        keywords="maxvipbet cadastro, maxvipbet login, criar conta maxvipbet, maxvipbet registro, max vip bet entrar, maxvipbet cadastro"
+        keywords="maxvipbet cadastro, maxvipbet login, criar conta maxvipbet registro, max vip bet entrar, maxvipbet cadastro"
         path="/auth"
       />
       <div className="flex items-center justify-center min-h-[70vh]">

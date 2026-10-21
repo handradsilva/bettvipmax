@@ -260,7 +260,7 @@ const Withdraw = () => {
       <SEOHead
         title="Sacar via PIX | MAXVIPBET - maxvipbet"
         description="Saque seus ganhos via PIX no MAXVIPBET (maxvipbet). Saque mínimo R$ 20 com pagamento instantâneo. Retire agora em maxvipbet.com!"
-        keywords="maxvipbet sacar, saque pix maxvipbet, maxvipbet saque, retirar dinheiro maxvipbet, maxvipbet saque pix"
+        keywords="maxvipbet sacar, saque pix maxvipbet saque, retirar dinheiro maxvipbet saque pix"
         path="/withdraw"
       />
       <div className="flex items-center justify-center min-h-[70vh]">

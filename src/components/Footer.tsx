@@ -18,7 +18,7 @@ const Footer = () => {
 
         {/* SEO keyword-rich description */}
         <p className="text-center text-xs text-muted-foreground mb-6 max-w-2xl mx-auto">
-          <strong>MAXVIPBET</strong> (maxvipbet / maxvipbet / max vip bet) — Sua plataforma de apostas online, cassino ao vivo e esportes. Acesse <strong>maxvipbet.com</strong>.
+          <strong>MAXVIPBET</strong> (maxvipbet / max vip bet) — Sua plataforma de apostas online, cassino ao vivo e esportes. Acesse <strong>maxvipbet.com</strong>.
         </p>
 
         {/* Internal links for SEO */}

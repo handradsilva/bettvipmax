@@ -20,14 +20,14 @@ const Index = () => {
     <Layout>
       <SEOHead
         title="MAXVIPBET | Apostas Online, Cassino e Esportes | maxvipbet"
-        description="MAXVIPBET (maxvipbet / maxvipbet) - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora!"
+        description="MAXVIPBET (maxvipbet) - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora!"
         path="/"
       />
       <div className="space-y-6">
         {/* Hidden SEO content for crawlers */}
         <h1 className="sr-only">MAXVIPBET - maxvipbet - Cassino Online e Apostas Esportivas</h1>
         <p className="sr-only">
-          Bem-vindo ao MAXVIPBET (maxvipbet, maxvipbet, max vip bet). A melhor plataforma de apostas online e cassino do Brasil.
+          Bem-vindo ao MAXVIPBET (maxvipbet, max vip bet). A melhor plataforma de apostas online e cassino do Brasil.
           Jogue slots, crash games, cassino ao vivo e apostas esportivas com os melhores bônus. Acesse maxvipbet.com agora!
         </p>
 
@@ -81,7 +81,7 @@ const Index = () => {
           <div className="space-y-3">
             <div>
               <p className="font-medium text-foreground">O que é MAXVIPBET (maxvipbet)?</p>
-              <p>O MAXVIPBET (maxvipbet, maxvipbet, max vip bet) é a melhor plataforma de apostas online e cassino do Brasil, com jogos ao vivo, slots, crash games e apostas esportivas. Acesse maxvipbet.com.</p>
+              <p>O MAXVIPBET (maxvipbet, max vip bet) é a melhor plataforma de apostas online e cassino do Brasil, com jogos ao vivo, slots, crash games e apostas esportivas. Acesse maxvipbet.com.</p>
             </div>
             <div>
               <p className="font-medium text-foreground">Como depositar no MAXVIPBET?</p>
