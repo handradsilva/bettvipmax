@@ -44,8 +44,8 @@ const Wallet = () => {
   return (
     <Layout>
       <SEOHead
-        title="Carteira | MAXVIPBET - maxvipbet"
-        description="Gerencie seu saldo e transações no MAXVIPBET (maxvipbet). Veja depósitos, saques e histórico completo em maxvipbet.com!"
+        title="Carteira | MAXVIPBET"
+        description="Gerencie seu saldo e transações no MAXVIPBET. Veja depósitos, saques e histórico completo em maxvipbet.com!"
         keywords="maxvipbet carteira, saldo maxvipbet transações, maxvipbet historico"
         path="/wallet"
       />

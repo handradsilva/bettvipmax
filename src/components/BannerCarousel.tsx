@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const banners = [
-  { src: "/images/banner1.webp", alt: "MAXVIPBET - maxvipbet - Bônus de boas-vindas e promoções exclusivas" },
-  { src: "/images/banner2.webp", alt: "MAXVIPBET - maxvipbet - Cassino ao vivo e apostas esportivas" },
+  { src: "/images/banner1.webp", alt: "MAXVIPBET - Bônus de boas-vindas e promoções exclusivas" },
+  { src: "/images/banner2.webp", alt: "MAXVIPBET - Cassino ao vivo e apostas esportivas" },
   { src: "/images/banner3.webp", alt: "MAXVIPBET - max vip bet - Crash games, slots e jogos populares" },
 ];
 

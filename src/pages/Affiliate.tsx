@@ -75,8 +75,8 @@ const Affiliate = () => {
   return (
     <Layout>
       <SEOHead
-        title="Programa de Afiliados | MAXVIPBET - maxvipbet"
-        description="Ganhe dinheiro indicando amigos no MAXVIPBET (maxvipbet). Programa de afiliados com comissões por cada indicado. Comece agora em maxvipbet.com!"
+        title="Programa de Afiliados | MAXVIPBET"
+        description="Ganhe dinheiro indicando amigos no MAXVIPBET. Programa de afiliados com comissões por cada indicado. Comece agora em maxvipbet.com!"
         keywords="maxvipbet afiliados, programa afiliados maxvipbet afiliado, ganhar dinheiro maxvipbet indicar amigos"
         path="/affiliate"
       />

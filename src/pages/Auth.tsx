@@ -86,10 +86,10 @@ const Auth = () => {
   return (
     <Layout>
       <SEOHead
-        title={isRegister ? "Cadastro | MAXVIPBET - maxvipbet" : "Login | MAXVIPBET - maxvipbet"}
+        title={isRegister ? "Cadastro | MAXVIPBET" : "Login | MAXVIPBET"}
         description={isRegister
-          ? "Crie sua conta no MAXVIPBET (maxvipbet). Cadastre-se grátis e ganhe bônus no primeiro depósito. Jogue slots, crash games e cassino ao vivo em maxvipbet.com!"
-          : "Faça login no MAXVIPBET (maxvipbet). Acesse sua conta para jogar cassino online, slots e apostas esportivas em maxvipbet.com!"
+          ? "Crie sua conta no MAXVIPBET. Cadastre-se grátis e ganhe bônus no primeiro depósito. Jogue slots, crash games e cassino ao vivo em maxvipbet.com!"
+          : "Faça login no MAXVIPBET. Acesse sua conta para jogar cassino online, slots e apostas esportivas em maxvipbet.com!"
         }
         keywords="maxvipbet cadastro, maxvipbet login, criar conta maxvipbet registro, max vip bet entrar, maxvipbet cadastro"
         path="/auth"
@@ -97,7 +97,7 @@ const Auth = () => {
       <div className="flex items-center justify-center min-h-[70vh]">
         <div className="w-full max-w-md p-6 rounded-2xl bg-card border border-border">
           <div className="text-center mb-6">
-            <img src="/images/logo.webp" alt="MAXVIPBET - maxvipbet cassino online" className="h-10 mx-auto mb-4" />
+            <img src="/images/logo.webp" alt="MAXVIPBET cassino online" className="h-10 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-foreground">
               {isRegister ? "Criar conta no MAXVIPBET" : "Entrar no MAXVIPBET"}
             </h1>

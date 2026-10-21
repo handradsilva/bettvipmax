@@ -11,8 +11,8 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-10">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <Link to="/" title="MAXVIPBET - maxvipbet - Página Inicial">
-            <img src="/images/logo.webp" alt="MAXVIPBET - maxvipbet logo" className="h-8 sm:h-10" />
+          <Link to="/" title="MAXVIPBET - Página Inicial">
+            <img src="/images/logo.webp" alt="MAXVIPBET logo" className="h-8 sm:h-10" />
           </Link>
         </div>
 
@@ -86,7 +86,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <p className="text-center text-[10px] sm:text-xs text-muted-foreground">
-          © 2024 MAXVIPBET (maxvipbet). Todos os direitos reservados. | Jogue com responsabilidade. | maxvipbet.com
+          © 2024 MAXVIPBET. Todos os direitos reservados. | Jogue com responsabilidade. | maxvipbet.com
         </p>
 
         {/* Back to top */}

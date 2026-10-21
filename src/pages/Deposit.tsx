@@ -153,8 +153,8 @@ const Deposit = () => {
   return (
     <Layout>
       <SEOHead
-        title="Depositar via PIX | MAXVIPBET - maxvipbet"
-        description="Deposite via PIX no MAXVIPBET (maxvipbet) de forma rápida e segura. Depósito mínimo R$ 20. Ganhe bônus no primeiro depósito em maxvipbet.com!"
+        title="Depositar via PIX | MAXVIPBET"
+        description="Deposite via PIX no MAXVIPBET de forma rápida e segura. Depósito mínimo R$ 20. Ganhe bônus no primeiro depósito em maxvipbet.com!"
         keywords="maxvipbet depositar, deposito pix maxvipbet pix, max vip bet deposito, maxvipbet depositar pix"
         path="/deposit"
       />

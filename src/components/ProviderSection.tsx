@@ -9,7 +9,7 @@ const ProviderSection = () => {
           <div
             key={provider.name}
             className="flex items-center justify-center px-3 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl bg-card border border-border hover:border-primary/40 transition-colors cursor-pointer"
-            title={`${provider.name} - Jogos disponíveis no MAXVIPBET (maxvipbet)`}
+            title={`${provider.name} - Jogos disponíveis no MAXVIPBET`}
           >
             <img
               src={provider.image}

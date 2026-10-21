@@ -11,7 +11,7 @@ const DEFAULT_KEYWORDS = "maxvipbet, max vip bet, maxvipbet, max vip bet, aposta
 
 const SEOHead = ({
   title = "MAXVIPBET | Apostas Online, Cassino e Esportes | maxvipbet",
-  description = "MAXVIPBET (maxvipbet) - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora em maxvipbet.com!",
+  description = "MAXVIPBET - A melhor plataforma de apostas online do Brasil. Cassino ao vivo, apostas esportivas, slots e bônus exclusivos. Jogue agora em maxvipbet.com!",
   keywords = DEFAULT_KEYWORDS,
   path = "/",
 }: SEOHeadProps) => {

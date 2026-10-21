@@ -7,8 +7,8 @@ const Sports = () => {
   return (
     <Layout>
       <SEOHead
-        title="Apostas Esportivas | MAXVIPBET - maxvipbet"
-        description="Apostas esportivas no MAXVIPBET (maxvipbet). Aposte em futebol, basquete, tênis e mais com as melhores odds. Deposite via PIX em maxvipbet.com!"
+        title="Apostas Esportivas | MAXVIPBET"
+        description="Apostas esportivas no MAXVIPBET. Aposte em futebol, basquete, tênis e mais com as melhores odds. Deposite via PIX em maxvipbet.com!"
         keywords="maxvipbet apostas esportivas, maxvipbet esportes, max vip bet futebol, apostas online futebol, odds esportivas, maxvipbet esportes"
         path="/sports"
       />

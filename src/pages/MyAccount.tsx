@@ -36,8 +36,8 @@ const MyAccount = () => {
   return (
     <Layout>
       <SEOHead
-        title="Minha Conta | MAXVIPBET - maxvipbet"
-        description="Gerencie sua conta no MAXVIPBET (maxvipbet). Veja seus dados pessoais, chave PIX e informações de perfil em maxvipbet.com!"
+        title="Minha Conta | MAXVIPBET"
+        description="Gerencie sua conta no MAXVIPBET. Veja seus dados pessoais, chave PIX e informações de perfil em maxvipbet.com!"
         keywords="maxvipbet conta, minha conta maxvipbet, perfil maxvipbet perfil"
         path="/my-account"
       />
